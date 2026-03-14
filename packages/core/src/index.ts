@@ -1,5 +1,6 @@
 export * from "./types.js";
 export * from "./persistence/index.js";
+export { KnowledgeGraphSchema, validateGraph, type ValidationResult } from "./schema.js";
 export { TreeSitterPlugin } from "./plugins/tree-sitter-plugin.js";
 export { GraphBuilder } from "./analyzer/graph-builder.js";
 export {

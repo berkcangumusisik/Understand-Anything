@@ -1,6 +1,7 @@
 import { readFileSync, writeFileSync, mkdirSync, existsSync } from "node:fs";
 import { join } from "node:path";
 import type { KnowledgeGraph, AnalysisMeta } from "../types.js";
+import { validateGraph } from "../schema.js";
 
 const UA_DIR = ".understand-anything";
 const GRAPH_FILE = "knowledge-graph.json";
@@ -19,10 +20,25 @@ export function saveGraph(projectRoot: string, graph: KnowledgeGraph): void {
   writeFileSync(join(dir, GRAPH_FILE), JSON.stringify(graph, null, 2), "utf-8");
 }
 
-export function loadGraph(projectRoot: string): KnowledgeGraph | null {
+export function loadGraph(
+  projectRoot: string,
+  options?: { validate?: boolean },
+): KnowledgeGraph | null {
   const filePath = join(projectRoot, UA_DIR, GRAPH_FILE);
   if (!existsSync(filePath)) return null;
-  return JSON.parse(readFileSync(filePath, "utf-8")) as KnowledgeGraph;
+
+  const data = JSON.parse(readFileSync(filePath, "utf-8"));
+
+  if (options?.validate !== false) {
+    const result = validateGraph(data);
+    if (!result.success) {
+      throw new Error(
+        `Invalid knowledge graph: ${result.errors!.join("; ")}`,
+      );
+    }
+  }
+
+  return data as KnowledgeGraph;
 }
 
 export function saveMeta(projectRoot: string, meta: AnalysisMeta): void {
