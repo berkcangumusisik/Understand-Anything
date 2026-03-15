@@ -1,113 +1,91 @@
-import Editor from "@monaco-editor/react";
 import { useDashboardStore } from "../store";
-
-const extensionToLanguage: Record<string, string> = {
-  ts: "typescript",
-  tsx: "typescript",
-  js: "javascript",
-  jsx: "javascript",
-  py: "python",
-  go: "go",
-  rs: "rust",
-  rb: "ruby",
-  java: "java",
-  kt: "kotlin",
-  cs: "csharp",
-  cpp: "cpp",
-  c: "c",
-  swift: "swift",
-  php: "php",
-  json: "json",
-  yaml: "yaml",
-  yml: "yaml",
-  md: "markdown",
-  html: "html",
-  css: "css",
-  sql: "sql",
-  sh: "shell",
-  bash: "shell",
-};
-
-function getLanguage(filePath: string | undefined): string {
-  if (!filePath) return "plaintext";
-  const ext = filePath.split(".").pop()?.toLowerCase() ?? "";
-  return extensionToLanguage[ext] ?? "plaintext";
-}
 
 export default function CodeViewer() {
   const graph = useDashboardStore((s) => s.graph);
-  const selectedNodeId = useDashboardStore((s) => s.selectedNodeId);
+  const codeViewerNodeId = useDashboardStore((s) => s.codeViewerNodeId);
+  const closeCodeViewer = useDashboardStore((s) => s.closeCodeViewer);
 
-  const node = graph?.nodes.find((n) => n.id === selectedNodeId) ?? null;
+  const node = graph?.nodes.find((n) => n.id === codeViewerNodeId) ?? null;
 
   if (!node) {
     return (
-      <div className="h-full w-full flex items-center justify-center bg-gray-800 rounded-lg">
-        <p className="text-gray-400 text-sm">
-          Select a node to view its source code
-        </p>
+      <div className="h-full w-full flex items-center justify-center bg-surface">
+        <p className="text-text-muted text-sm">No file selected</p>
       </div>
     );
   }
 
-  const language = getLanguage(node.filePath);
   const lineInfo = node.lineRange
-    ? `Lines ${node.lineRange[0]}-${node.lineRange[1]}`
+    ? `Lines ${node.lineRange[0]}\u2013${node.lineRange[1]}`
     : "Full file";
 
-  const placeholderCode = [
-    `// ${node.name}`,
-    `// Type: ${node.type}`,
-    `// File: ${node.filePath ?? "unknown"}`,
-    `// ${lineInfo}`,
-    `//`,
-    `// Summary:`,
-    `// ${node.summary}`,
-    `//`,
-    `// Note: Source code display requires file content access.`,
-    `// In a full integration, this panel will show the actual`,
-    `// source code from the analyzed project.`,
-    "",
-    ...(node.tags.length > 0
-      ? [`// Tags: ${node.tags.join(", ")}`]
-      : []),
-    ...(node.languageNotes
-      ? [`//`, `// Language Notes:`, `// ${node.languageNotes}`]
-      : []),
-  ].join("\n");
-
   return (
-    <div className="h-full w-full flex flex-col bg-gray-800 rounded-lg overflow-hidden">
-      <div className="flex items-center gap-3 px-3 py-2 bg-gray-900 border-b border-gray-700 shrink-0">
-        <span className="text-[10px] font-semibold uppercase tracking-wider text-gray-400 bg-gray-700 px-2 py-0.5 rounded">
+    <div className="h-full w-full flex flex-col bg-surface overflow-hidden">
+      {/* Header */}
+      <div className="flex items-center gap-3 px-4 py-2.5 bg-elevated border-b border-border-subtle shrink-0">
+        <span
+          className="text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded border"
+          style={{
+            color: "var(--color-node-file)",
+            borderColor: "rgba(74,124,155,0.3)",
+            backgroundColor: "rgba(74,124,155,0.1)",
+          }}
+        >
           {node.type}
         </span>
-        <span className="text-sm font-bold text-white truncate">
+        <span className="text-sm font-serif text-text-primary truncate">
           {node.name}
         </span>
         {node.filePath && (
-          <span className="text-xs text-gray-500 truncate ml-auto">
+          <span className="text-xs font-mono text-text-muted truncate ml-auto">
             {node.filePath}
           </span>
         )}
+        <span className="text-[10px] text-text-muted">{lineInfo}</span>
+        <button
+          onClick={closeCodeViewer}
+          className="text-text-muted hover:text-text-primary ml-2 transition-colors"
+        >
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
       </div>
 
-      <div className="flex-1 min-h-0">
-        <Editor
-          height="100%"
-          language={language}
-          value={placeholderCode}
-          theme="vs-dark"
-          options={{
-            readOnly: true,
-            minimap: { enabled: false },
-            fontSize: 13,
-            lineNumbers: "on",
-            scrollBeyondLastLine: false,
-            wordWrap: "on",
-            padding: { top: 8 },
-          }}
-        />
+      {/* Body */}
+      <div className="flex-1 overflow-auto p-5">
+        {/* Summary */}
+        <div className="mb-4">
+          <h4 className="text-[11px] font-semibold text-gold uppercase tracking-wider mb-2">Summary</h4>
+          <p className="text-sm text-text-secondary leading-relaxed">{node.summary}</p>
+        </div>
+
+        {/* Language notes callout */}
+        {node.languageNotes && (
+          <div className="mb-4 bg-gold/5 border border-gold/20 rounded-lg p-3">
+            <h4 className="text-[11px] font-semibold text-gold uppercase tracking-wider mb-1.5">Language Notes</h4>
+            <p className="text-sm text-text-secondary leading-relaxed">{node.languageNotes}</p>
+          </div>
+        )}
+
+        {/* Tags */}
+        {node.tags.length > 0 && (
+          <div className="mb-4">
+            <h4 className="text-[11px] font-semibold text-gold uppercase tracking-wider mb-2">Tags</h4>
+            <div className="flex flex-wrap gap-1.5">
+              {node.tags.map((tag) => (
+                <span key={tag} className="text-[11px] glass text-text-secondary px-2.5 py-1 rounded-full">
+                  {tag}
+                </span>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Source note */}
+        <div className="text-[11px] text-text-muted italic">
+          Source code available locally at {node.filePath ?? "the project directory"}
+        </div>
       </div>
     </div>
   );

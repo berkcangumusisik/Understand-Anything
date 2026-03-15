@@ -1,167 +1,111 @@
-import { useEffect } from "react";
-import type { KnowledgeGraph } from "@understand-anything/core";
+import { useEffect, useState } from "react";
+import { validateGraph } from "@understand-anything/core/schema";
 import { useDashboardStore } from "./store";
 import GraphView from "./components/GraphView";
 import CodeViewer from "./components/CodeViewer";
 import SearchBar from "./components/SearchBar";
 import NodeInfo from "./components/NodeInfo";
-import ChatPanel from "./components/ChatPanel";
 import LayerLegend from "./components/LayerLegend";
 import LearnPanel from "./components/LearnPanel";
 import PersonaSelector from "./components/PersonaSelector";
+import ProjectOverview from "./components/ProjectOverview";
 
 function App() {
   const graph = useDashboardStore((s) => s.graph);
   const setGraph = useDashboardStore((s) => s.setGraph);
+  const selectedNodeId = useDashboardStore((s) => s.selectedNodeId);
   const tourActive = useDashboardStore((s) => s.tourActive);
-  const startTour = useDashboardStore((s) => s.startTour);
-  const stopTour = useDashboardStore((s) => s.stopTour);
   const persona = useDashboardStore((s) => s.persona);
+  const codeViewerOpen = useDashboardStore((s) => s.codeViewerOpen);
+  const closeCodeViewer = useDashboardStore((s) => s.closeCodeViewer);
+  const [loadError, setLoadError] = useState<string | null>(null);
 
   useEffect(() => {
     fetch("/knowledge-graph.json")
       .then((res) => res.json())
-      .then((data: KnowledgeGraph) => setGraph(data))
-      .catch((err) => console.error("Failed to load knowledge graph:", err));
+      .then((data: unknown) => {
+        const result = validateGraph(data);
+        if (result.success && result.data) {
+          setGraph(result.data);
+        } else {
+          const errorMsg = result.errors?.join("; ") ?? "Unknown validation error";
+          console.error("Knowledge graph validation failed:", errorMsg);
+          setLoadError(`Invalid knowledge graph: ${errorMsg}`);
+        }
+      })
+      .catch((err) => {
+        console.error("Failed to load knowledge graph:", err);
+        setLoadError(`Failed to load knowledge graph: ${err instanceof Error ? err.message : String(err)}`);
+      });
   }, [setGraph]);
 
-  const nodeCount = graph?.nodes.length ?? 0;
-  const edgeCount = graph?.edges.length ?? 0;
-  const hasTour = (graph?.tour.length ?? 0) > 0;
+  // Determine sidebar content
+  // Learn persona always shows LearnPanel; tour active overrides everything
+  const sidebarContent = tourActive || persona === "junior" ? (
+    <LearnPanel />
+  ) : selectedNodeId ? (
+    <NodeInfo />
+  ) : (
+    <ProjectOverview />
+  );
 
   return (
-    <div className="h-screen w-screen flex flex-col bg-gray-900 text-white">
+    <div className="h-screen w-screen flex flex-col bg-root text-text-primary noise-overlay">
       {/* Header */}
-      <div className="flex items-center justify-between px-4 py-2 bg-gray-950 border-b border-gray-800 shrink-0">
-        <div className="flex items-center gap-4">
-          <h1 className="text-sm font-bold tracking-widest text-gray-200">
-            UNDERSTAND ANYTHING
+      <header className="flex items-center justify-between px-5 py-3 bg-surface border-b border-border-subtle shrink-0">
+        <div className="flex items-center gap-5">
+          <h1 className="font-serif text-lg text-text-primary tracking-wide">
+            {graph?.project.name ?? "Understand Anything"}
           </h1>
+          <div className="w-px h-5 bg-border-subtle" />
           <PersonaSelector />
         </div>
-        <div className="flex items-center gap-4 text-xs text-gray-400">
-          {graph && (
-            <>
-              <span>{graph.project.name}</span>
-              <span className="text-gray-600">|</span>
-              <span>{nodeCount} nodes</span>
-              <span className="text-gray-600">|</span>
-              <span>{edgeCount} edges</span>
-              <span className="text-gray-600">|</span>
-              <LayerLegend />
-            </>
-          )}
+        <div className="flex items-center gap-4">
+          <LayerLegend />
         </div>
-      </div>
+      </header>
 
-      {/* Search Bar */}
+      {/* Search */}
       <SearchBar />
 
-      {/* Persona-adaptive layout */}
-      {persona === "non-technical" ? (
-        /* Non-technical: 2-column layout — graph + stacked learn/chat (no CodeViewer) */
-        <div className="flex-1 grid grid-cols-2 gap-1 p-1 min-h-0">
-          <div className="min-h-0 min-w-0">
-            <GraphView />
-          </div>
-          <div className="min-h-0 min-w-0 flex flex-col gap-1">
-            <div className="flex-1 min-h-0">
-              <LearnPanel />
-            </div>
-            <div className="flex-1 min-h-0">
-              <ChatPanel />
-            </div>
-          </div>
-        </div>
-      ) : (
-        /* Junior + Experienced: 4-panel grid */
-        <div className="flex-1 grid grid-cols-2 grid-rows-2 gap-1 p-1 min-h-0">
-          {/* Top-left: Graph View */}
-          <div className="min-h-0 min-w-0">
-            <GraphView />
-          </div>
-
-          {/* Top-right: Code Viewer */}
-          <div className="min-h-0 min-w-0">
-            <CodeViewer />
-          </div>
-
-          {/* Bottom-left: Chat */}
-          <div className="min-h-0 min-w-0">
-            <ChatPanel />
-          </div>
-
-          {/* Bottom-right: persona-dependent */}
-          <div className="min-h-0 min-w-0 flex flex-col">
-            {persona === "junior" ? (
-              /* Junior: always show tabbed Details/Tour panel */
-              hasTour ? (
-                <>
-                  <div className="flex bg-gray-800 rounded-t-lg border-b border-gray-700 shrink-0">
-                    <button
-                      onClick={() => {
-                        if (tourActive) stopTour();
-                      }}
-                      className={`flex-1 text-xs font-medium py-1.5 px-3 transition-colors ${
-                        !tourActive
-                          ? "text-white border-b-2 border-indigo-500"
-                          : "text-gray-500 hover:text-gray-300"
-                      }`}
-                    >
-                      Details
-                    </button>
-                    <button
-                      onClick={() => {
-                        if (!tourActive) startTour();
-                      }}
-                      className={`flex-1 text-xs font-medium py-1.5 px-3 transition-colors ${
-                        tourActive
-                          ? "text-white border-b-2 border-indigo-500"
-                          : "text-gray-500 hover:text-gray-300"
-                      }`}
-                    >
-                      Tour
-                    </button>
-                  </div>
-                  <div className="flex-1 min-h-0">
-                    {tourActive ? <LearnPanel /> : <NodeInfo />}
-                  </div>
-                </>
-              ) : (
-                <NodeInfo />
-              )
-            ) : (
-              /* Experienced: show tabbed panel only when tour is explicitly active */
-              tourActive && hasTour ? (
-                <>
-                  <div className="flex bg-gray-800 rounded-t-lg border-b border-gray-700 shrink-0">
-                    <button
-                      onClick={() => stopTour()}
-                      className={`flex-1 text-xs font-medium py-1.5 px-3 transition-colors ${
-                        !tourActive
-                          ? "text-white border-b-2 border-indigo-500"
-                          : "text-gray-500 hover:text-gray-300"
-                      }`}
-                    >
-                      Details
-                    </button>
-                    <button
-                      className="flex-1 text-xs font-medium py-1.5 px-3 transition-colors text-white border-b-2 border-indigo-500"
-                    >
-                      Tour
-                    </button>
-                  </div>
-                  <div className="flex-1 min-h-0">
-                    <LearnPanel />
-                  </div>
-                </>
-              ) : (
-                <NodeInfo />
-              )
-            )}
-          </div>
+      {/* Error banner */}
+      {loadError && (
+        <div className="px-5 py-3 bg-red-900/30 border-b border-red-700 text-red-200 text-sm">
+          {loadError}
         </div>
       )}
+
+      {/* Main content: Graph + Sidebar */}
+      <div className="flex-1 flex min-h-0 relative">
+        {/* Graph area */}
+        <div className="flex-1 min-w-0 min-h-0">
+          <GraphView />
+        </div>
+
+        {/* Right sidebar */}
+        <aside className="w-[360px] shrink-0 bg-surface border-l border-border-subtle overflow-hidden">
+          {sidebarContent}
+        </aside>
+
+        {/* Code viewer overlay */}
+        {codeViewerOpen && (
+          <div className="absolute bottom-0 left-0 right-0 h-[40vh] bg-surface border-t border-border-subtle animate-slide-up z-20">
+            <div className="h-full flex flex-col">
+              <div className="flex items-center justify-end px-3 py-1 shrink-0">
+                <button
+                  onClick={closeCodeViewer}
+                  className="text-text-muted hover:text-text-primary text-xs transition-colors"
+                >
+                  Close
+                </button>
+              </div>
+              <div className="flex-1 min-h-0">
+                <CodeViewer />
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   );
 }

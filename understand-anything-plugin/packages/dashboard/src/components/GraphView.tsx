@@ -4,6 +4,7 @@ import {
   useNodesState,
   useEdgesState,
   Background,
+  BackgroundVariant,
   Controls,
   MiniMap,
 } from "@xyflow/react";
@@ -14,7 +15,7 @@ import CustomNode from "./CustomNode";
 import type { CustomFlowNode } from "./CustomNode";
 import { useDashboardStore } from "../store";
 import { applyDagreLayout, NODE_WIDTH, NODE_HEIGHT } from "../utils/layout";
-import { getLayerColor, getLayerBorderColor } from "./LayerLegend";
+// Layer colors are hardcoded to gold-tinted values in the group node styles
 
 const LAYER_PADDING = 40;
 
@@ -25,6 +26,7 @@ export default function GraphView() {
   const selectedNodeId = useDashboardStore((s) => s.selectedNodeId);
   const searchResults = useDashboardStore((s) => s.searchResults);
   const selectNode = useDashboardStore((s) => s.selectNode);
+  const openCodeViewer = useDashboardStore((s) => s.openCodeViewer);
   const showLayers = useDashboardStore((s) => s.showLayers);
   const tourHighlightedNodeIds = useDashboardStore((s) => s.tourHighlightedNodeIds);
   const persona = useDashboardStore((s) => s.persona);
@@ -60,7 +62,7 @@ export default function GraphView() {
         type: "custom" as const,
         position: { x: 0, y: 0 },
         data: {
-          label: node.name,
+          label: node.name ?? node.filePath?.split("/").pop() ?? node.id,
           nodeType: node.type,
           summary: node.summary,
           complexity: node.complexity,
@@ -78,8 +80,8 @@ export default function GraphView() {
       target: edge.target,
       label: edge.type,
       animated: edge.type === "calls",
-      style: { stroke: "#6b7280", strokeWidth: 1.5 },
-      labelStyle: { fill: "#9ca3af", fontSize: 10 },
+      style: { stroke: "rgba(212,165,116,0.3)", strokeWidth: 1.5 },
+      labelStyle: { fill: "#a39787", fontSize: 10 },
     }));
 
     // Run dagre layout on all nodes (without groups)
@@ -132,9 +134,6 @@ export default function GraphView() {
       const groupWidth = maxX - minX + LAYER_PADDING * 2;
       const groupHeight = maxY - minY + LAYER_PADDING * 2 + 24;
 
-      const bgColor = getLayerColor(layerIdx);
-      const borderColor = getLayerBorderColor(layerIdx);
-
       // Create the group node
       groupNodes.push({
         id: layer.id,
@@ -144,13 +143,13 @@ export default function GraphView() {
         style: {
           width: groupWidth,
           height: groupHeight,
-          backgroundColor: bgColor,
+          backgroundColor: "rgba(212,165,116,0.05)",
           borderRadius: 12,
-          border: `2px dashed ${borderColor}`,
+          border: `2px dashed rgba(212,165,116,0.25)`,
           padding: 8,
           fontSize: 13,
           fontWeight: 600,
-          color: borderColor,
+          color: "#d4a574",
         },
       });
 
@@ -201,8 +200,12 @@ export default function GraphView() {
       const isGroupNode = graph?.layers?.some((l) => l.id === node.id);
       if (isGroupNode) return;
       selectNode(node.id);
+      const graphNode = graph?.nodes.find((n) => n.id === node.id);
+      if (graphNode?.type === 'file') {
+        openCodeViewer(node.id);
+      }
     },
-    [selectNode, graph],
+    [selectNode, openCodeViewer, graph],
   );
 
   const onPaneClick = useCallback(() => {
@@ -211,8 +214,8 @@ export default function GraphView() {
 
   if (!graph) {
     return (
-      <div className="h-full w-full flex items-center justify-center bg-gray-800 rounded-lg">
-        <p className="text-gray-400 text-sm">No knowledge graph loaded</p>
+      <div className="h-full w-full flex items-center justify-center bg-root rounded-lg">
+        <p className="text-text-muted text-sm">No knowledge graph loaded</p>
       </div>
     );
   }
@@ -230,12 +233,12 @@ export default function GraphView() {
         fitView
         colorMode="dark"
       >
-        <Background />
+        <Background variant={BackgroundVariant.Dots} color="rgba(212,165,116,0.15)" gap={20} size={1} />
         <Controls />
         <MiniMap
-          nodeColor="#374151"
-          maskColor="rgba(0,0,0,0.6)"
-          className="!bg-gray-800"
+          nodeColor="#1a1a1a"
+          maskColor="rgba(10,10,10,0.7)"
+          className="!bg-surface !border !border-border-subtle"
         />
       </ReactFlow>
     </div>

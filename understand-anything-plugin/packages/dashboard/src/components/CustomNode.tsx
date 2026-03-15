@@ -1,39 +1,26 @@
 import { Handle, Position } from "@xyflow/react";
 import type { NodeProps, Node } from "@xyflow/react";
 
-const typeColors: Record<string, { bg: string; border: string; text: string }> =
-  {
-    file: {
-      bg: "bg-blue-900",
-      border: "border-blue-500",
-      text: "text-blue-300",
-    },
-    function: {
-      bg: "bg-green-900",
-      border: "border-green-500",
-      text: "text-green-300",
-    },
-    class: {
-      bg: "bg-purple-900",
-      border: "border-purple-500",
-      text: "text-purple-300",
-    },
-    module: {
-      bg: "bg-orange-900",
-      border: "border-orange-500",
-      text: "text-orange-300",
-    },
-    concept: {
-      bg: "bg-pink-900",
-      border: "border-pink-500",
-      text: "text-pink-300",
-    },
-  };
+const typeColors: Record<string, string> = {
+  file: "var(--color-node-file)",
+  function: "var(--color-node-function)",
+  class: "var(--color-node-class)",
+  module: "var(--color-node-module)",
+  concept: "var(--color-node-concept)",
+};
+
+const typeTextColors: Record<string, string> = {
+  file: "text-node-file",
+  function: "text-node-function",
+  class: "text-node-class",
+  module: "text-node-module",
+  concept: "text-node-concept",
+};
 
 const complexityColors: Record<string, string> = {
-  simple: "bg-green-600",
-  moderate: "bg-yellow-600",
-  complex: "bg-red-600",
+  simple: "text-node-function",
+  moderate: "text-gold-dim",
+  complex: "text-[#c97070]",
 };
 
 export interface CustomNodeData extends Record<string, unknown> {
@@ -52,64 +39,70 @@ export type CustomFlowNode = Node<CustomNodeData, "custom">;
 export default function CustomNode({
   data,
 }: NodeProps<CustomFlowNode>) {
-  const colors = typeColors[data.nodeType] ?? typeColors.file;
-  const complexityColor =
-    complexityColors[data.complexity] ?? complexityColors.simple;
+  const barColor = typeColors[data.nodeType] ?? typeColors.file;
+  const textColor = typeTextColors[data.nodeType] ?? typeTextColors.file;
+  const complexityColor = complexityColors[data.complexity] ?? complexityColors.simple;
 
-  let ringClass = "";
+  let extraClass = "";
   if (data.isSelected) {
-    ringClass = "ring-2 ring-white";
+    extraClass = "ring-2 ring-gold node-glow";
   } else if (data.isTourHighlighted) {
-    ringClass = "ring-2 ring-blue-400 animate-pulse";
+    extraClass = "ring-2 ring-gold-dim animate-gold-pulse";
   } else if (data.isHighlighted) {
     const score = data.searchScore ?? 1;
     if (score <= 0.1) {
-      ringClass = "ring-2 ring-yellow-300";
+      extraClass = "ring-2 ring-gold-bright";
     } else if (score <= 0.3) {
-      ringClass = "ring-2 ring-yellow-400";
+      extraClass = "ring-2 ring-gold";
     } else {
-      ringClass = "ring-2 ring-yellow-500/60";
+      extraClass = "ring-1 ring-gold-dim/60";
     }
   }
 
+  const name = data.label ?? "unnamed";
   const truncatedName =
-    data.label.length > 24 ? data.label.slice(0, 22) + "..." : data.label;
+    name.length > 24 ? name.slice(0, 22) + "..." : name;
 
   return (
     <div
-      className={`rounded-lg border-2 ${colors.bg} ${colors.border} ${ringClass} px-3 py-2 min-w-[180px] max-w-[220px] shadow-lg`}
+      className={`relative rounded-lg bg-elevated border border-border-subtle ${extraClass} min-w-[180px] max-w-[220px] overflow-hidden transition-all duration-200`}
+      style={{ boxShadow: '0 2px 8px rgba(0,0,0,0.3)' }}
     >
+      {/* Left color bar */}
+      <div
+        className="absolute left-0 top-0 bottom-0 w-1 rounded-l-lg"
+        style={{ backgroundColor: barColor }}
+      />
+
       <Handle
         type="target"
         position={Position.Top}
-        className="!bg-gray-400 !w-2 !h-2"
+        className="!bg-text-muted !w-2 !h-2"
       />
 
-      <div className="flex items-center justify-between mb-1">
-        <span
-          className={`text-[10px] font-semibold uppercase tracking-wider ${colors.text}`}
-        >
-          {data.nodeType}
-        </span>
-        <span
-          className={`text-[9px] px-1.5 py-0.5 rounded-full text-white font-medium ${complexityColor}`}
-        >
-          {data.complexity}
-        </span>
-      </div>
+      <div className="pl-4 pr-3 py-2">
+        <div className="flex items-center justify-between mb-1">
+          <span className={`text-[10px] font-semibold uppercase tracking-wider ${textColor}`}>
+            {data.nodeType}
+          </span>
+          <span className={`text-[9px] font-mono ${complexityColor}`}>
+            {data.complexity}
+          </span>
+        </div>
 
-      <div className="text-sm font-bold text-white truncate" title={data.label}>
-        {truncatedName}
-      </div>
+        <div className="text-sm font-serif text-text-primary truncate" title={data.label}>
+          {truncatedName}
+        </div>
 
-      <div className="text-[11px] text-gray-300 mt-1 line-clamp-2 leading-tight">
-        {data.summary}
+        <div className="text-[11px] text-text-secondary mt-1 line-clamp-2 leading-tight">
+          {data.summary}
+        </div>
       </div>
 
       <Handle
         type="source"
         position={Position.Bottom}
-        className="!bg-gray-400 !w-2 !h-2"
+        className="!bg-text-muted !w-2 !h-2"
       />
     </div>
   );

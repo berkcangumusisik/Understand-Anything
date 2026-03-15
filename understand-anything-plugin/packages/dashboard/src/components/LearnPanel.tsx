@@ -22,11 +22,11 @@ export default function LearnPanel() {
   // State 1: No tour available
   if (!hasTour) {
     return (
-      <div className="h-full w-full flex items-center justify-center bg-gray-800 rounded-lg">
+      <div className="h-full w-full flex items-center justify-center">
         <div className="text-center px-4">
-          <div className="text-2xl mb-2 text-gray-600">&#x1f9ed;</div>
-          <p className="text-gray-400 text-sm">No tour available</p>
-          <p className="text-gray-500 text-xs mt-1">
+          <div className="text-2xl mb-2 text-text-muted">&#x1f9ed;</div>
+          <p className="text-text-muted text-sm">No tour available</p>
+          <p className="text-text-muted text-xs mt-1">
             Generate a tour from your knowledge graph to get a guided walkthrough
           </p>
         </div>
@@ -37,34 +37,34 @@ export default function LearnPanel() {
   // State 2: Tour available but not started
   if (!tourActive) {
     return (
-      <div className="h-full w-full bg-gray-800 rounded-lg overflow-auto p-4">
+      <div className="h-full w-full overflow-auto p-5">
         <div className="mb-4">
-          <h2 className="text-lg font-bold text-white mb-1">Project Tour</h2>
-          <p className="text-xs text-gray-400">
+          <h2 className="text-lg font-serif text-text-primary mb-1">Project Tour</h2>
+          <p className="text-xs text-text-muted">
             {tourSteps.length} steps &middot; Guided walkthrough of the codebase
           </p>
         </div>
 
         <button
           onClick={startTour}
-          className="w-full mb-4 bg-indigo-600 text-white text-sm font-medium py-2 px-4 rounded hover:bg-indigo-500 transition-colors"
+          className="w-full mb-4 bg-gold/10 border border-gold/30 text-gold text-sm font-medium py-2.5 px-4 rounded-lg hover:bg-gold/20 transition-colors"
         >
           Start Tour
         </button>
 
         <div className="space-y-2">
-          <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">
+          <h3 className="text-[11px] font-semibold text-gold uppercase tracking-wider mb-2">
             Steps
           </h3>
           {tourSteps.map((step, i) => (
             <div
               key={step.order}
-              className="flex items-start gap-2 text-xs bg-gray-700/50 rounded px-3 py-2"
+              className="flex items-start gap-2 text-xs bg-elevated rounded-lg px-3 py-2 border border-border-subtle"
             >
-              <span className="text-gray-500 font-mono shrink-0 mt-0.5">
+              <span className="text-gold font-mono shrink-0 mt-0.5">
                 {i + 1}.
               </span>
-              <span className="text-gray-300">{step.title}</span>
+              <span className="text-text-secondary">{step.title}</span>
             </div>
           ))}
         </div>
@@ -82,29 +82,29 @@ export default function LearnPanel() {
   const isLast = currentTourStep === totalSteps - 1;
 
   return (
-    <div className="h-full w-full bg-gray-800 rounded-lg flex flex-col overflow-hidden">
+    <div className="h-full w-full flex flex-col overflow-hidden">
       {/* Header with progress counter and exit */}
-      <div className="flex items-center justify-between px-3 py-2 border-b border-gray-700 shrink-0">
+      <div className="flex items-center justify-between px-3 py-2 border-b border-border-subtle shrink-0">
         <div className="flex items-center gap-2">
-          <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider">
+          <h3 className="text-[11px] font-semibold text-gold uppercase tracking-wider">
             Tour
           </h3>
-          <span className="text-xs text-gray-500">
+          <span className="text-xs text-text-muted">
             {currentTourStep + 1} / {totalSteps}
           </span>
         </div>
         <button
           onClick={stopTour}
-          className="text-[10px] text-gray-500 hover:text-gray-300 transition-colors"
+          className="text-[10px] text-text-muted hover:text-text-secondary transition-colors"
         >
           Exit Tour
         </button>
       </div>
 
       {/* Progress bar */}
-      <div className="h-1 bg-gray-700 shrink-0">
+      <div className="h-1 bg-elevated shrink-0">
         <div
-          className="h-full bg-indigo-500 transition-all duration-300"
+          className="h-full bg-gold transition-all duration-300"
           style={{ width: `${progressPct}%` }}
         />
       </div>
@@ -112,10 +112,10 @@ export default function LearnPanel() {
       {/* Scrollable content */}
       <div className="flex-1 overflow-y-auto p-4 min-h-0">
         {/* Step title */}
-        <h2 className="text-lg font-bold text-white mb-3">{step.title}</h2>
+        <h2 className="text-lg font-serif text-text-primary mb-3">{step.title}</h2>
 
         {/* Description via ReactMarkdown */}
-        <div className="text-sm text-gray-300 leading-relaxed mb-4 tour-markdown">
+        <div className="text-sm text-text-secondary leading-relaxed mb-4 tour-markdown">
           <ReactMarkdown
             components={{
               p: ({ children }) => (
@@ -154,11 +154,11 @@ export default function LearnPanel() {
 
         {/* Language lesson */}
         {step.languageLesson && (
-          <div className="bg-indigo-900/40 border border-indigo-700 rounded p-3 mb-4">
-            <h4 className="text-xs font-semibold text-indigo-300 uppercase tracking-wider mb-1.5">
+          <div className="bg-gold/5 border border-gold/20 rounded p-3 mb-4">
+            <h4 className="text-[11px] font-semibold text-gold uppercase tracking-wider mb-1.5">
               Language Lesson
             </h4>
-            <p className="text-sm text-indigo-200 leading-relaxed">
+            <p className="text-sm text-text-secondary leading-relaxed">
               {step.languageLesson}
             </p>
           </div>
@@ -167,7 +167,7 @@ export default function LearnPanel() {
         {/* Referenced component pills */}
         {step.nodeIds.length > 0 && (
           <div className="mb-4">
-            <h4 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">
+            <h4 className="text-[11px] font-semibold text-gold uppercase tracking-wider mb-2">
               Referenced Components
             </h4>
             <div className="flex flex-wrap gap-1.5">
@@ -177,7 +177,7 @@ export default function LearnPanel() {
                   <button
                     key={nodeId}
                     onClick={() => selectNode(nodeId)}
-                    className="text-[11px] bg-gray-700 text-gray-300 px-2 py-0.5 rounded-full hover:bg-gray-600 hover:text-white transition-colors cursor-pointer"
+                    className="text-[11px] glass text-text-secondary px-2.5 py-1 rounded-full hover:text-text-primary transition-colors cursor-pointer"
                   >
                     {node?.name ?? nodeId}
                   </button>
@@ -189,7 +189,7 @@ export default function LearnPanel() {
       </div>
 
       {/* Navigation: dots + prev/next */}
-      <div className="px-3 py-2 border-t border-gray-700 shrink-0">
+      <div className="px-3 py-2 border-t border-border-subtle shrink-0">
         {/* Step dots */}
         <div className="flex justify-center gap-1.5 mb-2">
           {tourSteps.map((_, i) => (
@@ -198,8 +198,8 @@ export default function LearnPanel() {
               onClick={() => setTourStep(i)}
               className={`w-2 h-2 rounded-full transition-colors ${
                 i === currentTourStep
-                  ? "bg-indigo-500"
-                  : "bg-gray-600 hover:bg-gray-500"
+                  ? "bg-gold"
+                  : "bg-elevated hover:bg-surface"
               }`}
               aria-label={`Go to step ${i + 1}`}
             />
@@ -211,13 +211,13 @@ export default function LearnPanel() {
           <button
             onClick={prevTourStep}
             disabled={isFirst}
-            className="flex-1 text-xs bg-gray-700 text-gray-300 py-1.5 rounded hover:bg-gray-600 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+            className="flex-1 text-xs bg-elevated text-text-secondary py-1.5 rounded-lg hover:bg-surface disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
           >
             Prev
           </button>
           <button
             onClick={isLast ? stopTour : nextTourStep}
-            className="flex-1 text-xs bg-indigo-600 text-white py-1.5 rounded hover:bg-indigo-500 transition-colors"
+            className="flex-1 text-xs bg-gold/10 border border-gold/30 text-gold py-1.5 rounded-lg hover:bg-gold/20 transition-colors"
           >
             {isLast ? "Finish" : "Next"}
           </button>

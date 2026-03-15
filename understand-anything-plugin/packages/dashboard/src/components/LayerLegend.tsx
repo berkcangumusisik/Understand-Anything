@@ -47,10 +47,10 @@ export default function LayerLegend() {
         disabled={!hasLayers}
         className={`px-2 py-0.5 rounded text-[11px] font-medium transition-colors ${
           showLayers && hasLayers
-            ? "bg-blue-600 text-white"
+            ? "bg-gold/20 text-gold"
             : hasLayers
-              ? "bg-gray-700 text-gray-300 hover:bg-gray-600"
-              : "bg-gray-800 text-gray-600 cursor-not-allowed"
+              ? "bg-elevated text-text-secondary hover:bg-surface"
+              : "bg-elevated text-text-muted cursor-not-allowed"
         }`}
         title={
           hasLayers
@@ -71,9 +71,9 @@ export default function LayerLegend() {
                 className="inline-block w-2 h-2 rounded-full"
                 style={{ backgroundColor: getLayerBorderColor(i) }}
               />
-              <span className="text-gray-400 text-[11px]">
+              <span className="text-text-secondary text-[11px]">
                 {layer.name}
-                <span className="text-gray-600 ml-0.5">
+                <span className="text-text-muted ml-0.5">
                   ({layer.nodeIds.length})
                 </span>
               </span>

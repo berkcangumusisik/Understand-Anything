@@ -2,11 +2,11 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useDashboardStore } from "../store";
 
 const typeBadgeColors: Record<string, string> = {
-  file: "bg-blue-700 text-blue-200",
-  function: "bg-green-700 text-green-200",
-  class: "bg-purple-700 text-purple-200",
-  module: "bg-orange-700 text-orange-200",
-  concept: "bg-pink-700 text-pink-200",
+  file: "text-node-file border border-node-file/30 bg-node-file/10",
+  function: "text-node-function border border-node-function/30 bg-node-function/10",
+  class: "text-node-class border border-node-class/30 bg-node-class/10",
+  module: "text-node-module border border-node-module/30 bg-node-module/10",
+  concept: "text-node-concept border border-node-concept/30 bg-node-concept/10",
 };
 
 export default function SearchBar() {
@@ -73,9 +73,9 @@ export default function SearchBar() {
 
   return (
     <div ref={containerRef} className="relative z-10">
-      <div className="flex items-center gap-2 px-4 py-2 bg-gray-800 border-b border-gray-700">
+      <div className="flex items-center gap-2 px-4 py-2 bg-surface border-b border-border-subtle">
         <svg
-          className="w-4 h-4 text-gray-400 shrink-0"
+          className="w-4 h-4 text-text-muted shrink-0"
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
@@ -94,15 +94,15 @@ export default function SearchBar() {
           onChange={handleInputChange}
           onFocus={() => setDropdownOpen(true)}
           placeholder="Search nodes by name, summary, or tags..."
-          className="flex-1 bg-gray-700 text-white text-sm rounded px-3 py-1.5 border border-gray-600 focus:outline-none focus:border-blue-500 placeholder-gray-400"
+          className="flex-1 bg-elevated text-text-primary text-sm rounded-lg px-3 py-1.5 border border-border-subtle focus:outline-none focus:border-gold/50 placeholder-text-muted"
         />
-        <div className="flex items-center gap-1 bg-gray-700 rounded p-0.5 shrink-0">
+        <div className="flex items-center gap-1 bg-elevated rounded-lg p-0.5 shrink-0">
           <button
             onClick={() => setSearchMode("fuzzy")}
             className={`text-[10px] px-1.5 py-0.5 rounded transition-colors ${
               searchMode === "fuzzy"
-                ? "bg-gray-600 text-white"
-                : "text-gray-400 hover:text-gray-300"
+                ? "bg-gold/20 text-gold"
+                : "text-text-muted hover:text-text-secondary"
             }`}
           >
             Fuzzy
@@ -111,24 +111,24 @@ export default function SearchBar() {
             onClick={() => setSearchMode("semantic")}
             className={`text-[10px] px-1.5 py-0.5 rounded transition-colors ${
               searchMode === "semantic"
-                ? "bg-gray-600 text-white"
-                : "text-gray-400 hover:text-gray-300"
+                ? "bg-gold/20 text-gold"
+                : "text-text-muted hover:text-text-secondary"
             }`}
           >
             Semantic
           </button>
         </div>
         {searchQuery.trim() && (
-          <span className="text-xs text-gray-400 shrink-0">
+          <span className="text-xs text-text-muted shrink-0">
             {searchResults.length} result{searchResults.length !== 1 ? "s" : ""}{" "}
-            <span className="text-gray-500">({searchMode})</span>
+            <span className="text-text-muted">({searchMode})</span>
           </span>
         )}
       </div>
 
       {/* Dropdown results */}
       {showDropdown && (
-        <div className="absolute left-4 right-4 top-full mt-0.5 bg-gray-800 border border-gray-600 rounded-lg shadow-xl overflow-hidden">
+        <div className="absolute left-4 right-4 top-full mt-0.5 glass rounded-lg shadow-xl overflow-hidden">
           {topResults.map((result) => {
             const node = nodeMap.get(result.nodeId);
             if (!node) return null;
@@ -141,7 +141,7 @@ export default function SearchBar() {
                 key={result.nodeId}
                 type="button"
                 onClick={() => handleResultClick(result.nodeId)}
-                className="w-full flex items-center gap-3 px-3 py-2 hover:bg-gray-700 transition-colors text-left"
+                className="w-full flex items-center gap-3 px-3 py-2 hover:bg-elevated transition-colors text-left"
               >
                 {/* Type badge */}
                 <span
@@ -151,19 +151,19 @@ export default function SearchBar() {
                 </span>
 
                 {/* Node name */}
-                <span className="text-sm text-white truncate flex-1">
+                <span className="text-sm text-text-primary truncate flex-1">
                   {node.name}
                 </span>
 
                 {/* Relevance bar */}
                 <div className="flex items-center gap-1.5 shrink-0">
-                  <div className="w-16 h-1.5 bg-gray-600 rounded-full overflow-hidden">
+                  <div className="w-16 h-1.5 bg-elevated rounded-full overflow-hidden">
                     <div
-                      className="h-full bg-blue-400 rounded-full"
+                      className="h-full bg-gold rounded-full"
                       style={{ width: `${relevance}%` }}
                     />
                   </div>
-                  <span className="text-[10px] text-gray-400 w-7 text-right">
+                  <span className="text-[10px] text-text-muted w-7 text-right">
                     {relevance}%
                   </span>
                 </div>

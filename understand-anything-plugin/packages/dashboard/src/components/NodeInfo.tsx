@@ -1,38 +1,31 @@
 import { useState } from "react";
-import ReactMarkdown from "react-markdown";
 import { useDashboardStore } from "../store";
 
 const typeBadgeColors: Record<string, string> = {
-  file: "bg-blue-800 text-blue-200",
-  function: "bg-green-800 text-green-200",
-  class: "bg-purple-800 text-purple-200",
-  module: "bg-orange-800 text-orange-200",
-  concept: "bg-pink-800 text-pink-200",
+  file: "text-node-file border border-node-file/30 bg-node-file/10",
+  function: "text-node-function border border-node-function/30 bg-node-function/10",
+  class: "text-node-class border border-node-class/30 bg-node-class/10",
+  module: "text-node-module border border-node-module/30 bg-node-module/10",
+  concept: "text-node-concept border border-node-concept/30 bg-node-concept/10",
 };
 
 const complexityBadgeColors: Record<string, string> = {
-  simple: "bg-green-700 text-green-200",
-  moderate: "bg-yellow-700 text-yellow-200",
-  complex: "bg-red-700 text-red-200",
+  simple: "text-node-function border border-node-function/30 bg-node-function/10",
+  moderate: "text-gold-dim border border-gold-dim/30 bg-gold-dim/10",
+  complex: "text-[#c97070] border border-[#c97070]/30 bg-[#c97070]/10",
 };
 
 export default function NodeInfo() {
   const graph = useDashboardStore((s) => s.graph);
   const selectedNodeId = useDashboardStore((s) => s.selectedNodeId);
-  const apiKey = useDashboardStore((s) => s.apiKey);
-  const nodeExplanation = useDashboardStore((s) => s.nodeExplanation);
-  const nodeExplanationLoading = useDashboardStore(
-    (s) => s.nodeExplanationLoading,
-  );
-  const explainNode = useDashboardStore((s) => s.explainNode);
   const [languageExpanded, setLanguageExpanded] = useState(true);
 
   const node = graph?.nodes.find((n) => n.id === selectedNodeId) ?? null;
 
   if (!node) {
     return (
-      <div className="h-full w-full flex items-center justify-center bg-gray-800 rounded-lg">
-        <p className="text-gray-400 text-sm">Select a node to see details</p>
+      <div className="h-full w-full flex items-center justify-center bg-surface">
+        <p className="text-text-muted text-sm">Select a node to see details</p>
       </div>
     );
   }
@@ -46,7 +39,7 @@ export default function NodeInfo() {
     complexityBadgeColors[node.complexity] ?? complexityBadgeColors.simple;
 
   return (
-    <div className="h-full w-full bg-gray-800 rounded-lg overflow-auto p-4">
+    <div className="h-full w-full overflow-auto p-5 animate-fade-slide-in">
       <div className="flex items-center gap-2 mb-3">
         <span
           className={`text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded ${typeBadge}`}
@@ -60,15 +53,15 @@ export default function NodeInfo() {
         </span>
       </div>
 
-      <h2 className="text-lg font-bold text-white mb-2">{node.name}</h2>
+      <h2 className="text-lg font-serif text-text-primary mb-2">{node.name}</h2>
 
-      <p className="text-sm text-gray-300 mb-4 leading-relaxed">
+      <p className="text-sm text-text-secondary mb-4 leading-relaxed">
         {node.summary}
       </p>
 
       {node.filePath && (
-        <div className="text-xs text-gray-400 mb-2">
-          <span className="font-medium text-gray-500">File:</span>{" "}
+        <div className="text-xs text-text-secondary mb-2">
+          <span className="font-medium text-text-muted">File:</span>{" "}
           {node.filePath}
           {node.lineRange && (
             <span className="ml-2">
@@ -82,7 +75,7 @@ export default function NodeInfo() {
         <div className="mb-4">
           <button
             onClick={() => setLanguageExpanded(!languageExpanded)}
-            className="flex items-center gap-1.5 text-xs font-semibold text-indigo-400 uppercase tracking-wider mb-2 hover:text-indigo-300 transition-colors"
+            className="flex items-center gap-1.5 text-xs font-semibold text-gold uppercase tracking-wider mb-2 hover:text-gold-bright transition-colors"
           >
             <svg
               className={`w-3 h-3 transition-transform ${languageExpanded ? "rotate-90" : ""}`}
@@ -95,8 +88,8 @@ export default function NodeInfo() {
             Language Concepts
           </button>
           {languageExpanded && (
-            <div className="bg-indigo-900/30 border border-indigo-700/50 rounded-lg p-3">
-              <p className="text-sm text-indigo-200 leading-relaxed">
+            <div className="bg-gold/5 border border-gold/20 rounded-lg p-3">
+              <p className="text-sm text-text-secondary leading-relaxed">
                 {node.languageNotes}
               </p>
             </div>
@@ -104,57 +97,16 @@ export default function NodeInfo() {
         </div>
       )}
 
-      {apiKey && (
-        <div className="mb-4">
-          {!nodeExplanation && !nodeExplanationLoading && (
-            <button
-              onClick={() => explainNode(node.id)}
-              className="text-xs bg-indigo-600 text-white px-3 py-1.5 rounded hover:bg-indigo-500 transition-colors"
-            >
-              Explain This
-            </button>
-          )}
-          {nodeExplanationLoading && (
-            <div className="text-xs text-gray-400 animate-pulse">
-              Generating explanation...
-            </div>
-          )}
-          {nodeExplanation && (
-            <div className="bg-gray-700/50 rounded-lg p-3 text-sm text-gray-300 leading-relaxed">
-              <ReactMarkdown
-                components={{
-                  p: ({ children }) => (
-                    <p className="mb-2 last:mb-0">{children}</p>
-                  ),
-                  strong: ({ children }) => (
-                    <strong className="font-semibold text-white">
-                      {children}
-                    </strong>
-                  ),
-                  code: ({ children }) => (
-                    <code className="bg-gray-900 rounded px-1 py-0.5 text-[11px]">
-                      {children}
-                    </code>
-                  ),
-                }}
-              >
-                {nodeExplanation}
-              </ReactMarkdown>
-            </div>
-          )}
-        </div>
-      )}
-
       {node.tags.length > 0 && (
         <div className="mb-4">
-          <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">
+          <h3 className="text-[11px] font-semibold text-gold uppercase tracking-wider mb-2">
             Tags
           </h3>
           <div className="flex flex-wrap gap-1.5">
             {node.tags.map((tag) => (
               <span
                 key={tag}
-                className="text-[11px] bg-gray-700 text-gray-300 px-2 py-0.5 rounded-full"
+                className="text-[11px] glass text-text-secondary px-2.5 py-1 rounded-full"
               >
                 {tag}
               </span>
@@ -165,7 +117,7 @@ export default function NodeInfo() {
 
       {connections.length > 0 && (
         <div>
-          <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">
+          <h3 className="text-[11px] font-semibold text-gold uppercase tracking-wider mb-2">
             Connections ({connections.length})
           </h3>
           <div className="space-y-1.5">
@@ -178,11 +130,11 @@ export default function NodeInfo() {
               return (
                 <div
                   key={i}
-                  className="text-xs bg-gray-700/50 rounded px-2 py-1.5 flex items-center gap-2"
+                  className="text-xs bg-elevated rounded-lg px-3 py-2 border border-border-subtle flex items-center gap-2"
                 >
-                  <span className="text-gray-400 font-mono">{arrow}</span>
-                  <span className="text-gray-400">{edge.type}</span>
-                  <span className="text-white truncate">
+                  <span className="text-gold font-mono">{arrow}</span>
+                  <span className="text-text-muted">{edge.type}</span>
+                  <span className="text-text-primary truncate">
                     {otherNode?.name ?? otherId}
                   </span>
                 </div>

@@ -10,6 +10,10 @@
   <a href="https://docs.anthropic.com/en/docs/claude-code"><img src="https://img.shields.io/badge/Claude_Code-Plugin-8A2BE2?style=for-the-badge" alt="Claude Code Plugin" /></a>
 </p>
 
+<p align="center">
+  <img src="assets/overview.png" alt="Understand Anything Dashboard" width="800" />
+</p>
+
 ---
 
 **You just joined a new team. The codebase is 200,000 lines of code. Where do you even start?**
@@ -168,7 +172,7 @@ understand-anything-plugin/
 
 ### Tech Stack
 
-TypeScript, pnpm workspaces, React 18, Vite, TailwindCSS, React Flow, Monaco Editor, Zustand, web-tree-sitter, Fuse.js, Zod, Dagre
+TypeScript, pnpm workspaces, React 18, Vite, TailwindCSS v4, React Flow, Zustand, web-tree-sitter, Fuse.js, Zod, Dagre
 
 ### Development Commands
 
