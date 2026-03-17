@@ -41,10 +41,10 @@ Remove ALL files matching these patterns:
 - **Binary/asset files:** `.png`, `.jpg`, `.jpeg`, `.gif`, `.svg`, `.ico`, `.woff`, `.woff2`, `.ttf`, `.eot`, `.mp3`, `.mp4`, `.pdf`, `.zip`, `.tar`, `.gz`
 - **Generated files:** `*.min.js`, `*.min.css`, `*.map`, `*.d.ts`, `*.generated.*`
 - **IDE/editor config:** paths containing `.idea/`, `.vscode/`
-- **Config/doc files:** `*.md`, `*.txt`, `*.yml`, `*.yaml`, `*.toml`, `*.json`, `*.xml`, `*.lock`, `*.cfg`, `*.ini`, `Makefile`, `Dockerfile`, `*.sh` (keep `.sh` only if the project is primarily bash)
+- **Config/doc files:** `*.md`, `*.txt`, `*.yml`, `*.yaml`, `*.toml`, `*.json`, `*.xml`, `*.lock`, `*.cfg`, `*.ini`, `Makefile`, `Dockerfile`
 - **Misc non-source:** `LICENSE`, `.gitignore`, `.editorconfig`, `.prettierrc`, `.eslintrc*`, `*.log`
 
-The goal is to keep ONLY source code files (`.ts`, `.tsx`, `.js`, `.jsx`, `.py`, `.go`, `.rs`, `.java`, `.rb`, `.cpp`, `.cc`, `.cxx`, `.h`, `.hpp`, `.c`, `.cs`, `.swift`, `.kt`, `.php`, `.vue`, `.svelte`).
+The goal is to keep ONLY source code files (`.ts`, `.tsx`, `.js`, `.jsx`, `.py`, `.go`, `.rs`, `.java`, `.rb`, `.cpp`, `.cc`, `.cxx`, `.h`, `.hpp`, `.c`, `.cs`, `.swift`, `.kt`, `.php`, `.vue`, `.svelte`, `.sh`, `.bash`).
 
 **Step 3 -- Language Detection**
 
@@ -67,6 +67,7 @@ Map file extensions to language identifiers:
 | `.php` | `php` |
 | `.vue` | `vue` |
 | `.svelte` | `svelte` |
+| `.sh`, `.bash` | `bash` |
 
 Collect unique languages, sorted alphabetically.
 
