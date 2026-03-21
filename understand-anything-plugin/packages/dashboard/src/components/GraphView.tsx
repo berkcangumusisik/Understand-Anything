@@ -1,8 +1,10 @@
-import { useCallback, useEffect, useMemo } from "react";
+import { useCallback, useEffect, useMemo, useRef } from "react";
 import {
   ReactFlow,
+  ReactFlowProvider,
   useNodesState,
   useEdgesState,
+  useReactFlow,
   Background,
   BackgroundVariant,
   Controls,
@@ -21,7 +23,68 @@ const LAYER_PADDING = 40;
 
 const nodeTypes = { custom: CustomNode };
 
-export default function GraphView() {
+/**
+ * Inner component that pans/zooms to tour-highlighted nodes.
+ * Must be rendered inside <ReactFlow> so useReactFlow() works.
+ */
+function TourFitView() {
+  const tourHighlightedNodeIds = useDashboardStore((s) => s.tourHighlightedNodeIds);
+  const { fitView } = useReactFlow();
+  const prevRef = useRef<string[]>([]);
+
+  useEffect(() => {
+    const prev = prevRef.current;
+    const changed =
+      tourHighlightedNodeIds.length > 0 &&
+      (tourHighlightedNodeIds.length !== prev.length ||
+        tourHighlightedNodeIds.some((id, i) => id !== prev[i]));
+    prevRef.current = tourHighlightedNodeIds;
+
+    if (changed) {
+      // Small delay to ensure nodes are rendered before fitting
+      requestAnimationFrame(() => {
+        fitView({
+          nodes: tourHighlightedNodeIds.map((id) => ({ id })),
+          duration: 500,
+          padding: 0.3,
+          maxZoom: 1.2,
+          minZoom: 0.01,
+        });
+      });
+    }
+  }, [tourHighlightedNodeIds, fitView]);
+
+  return null;
+}
+
+/**
+ * Centers the graph on the selected node (e.g. from search).
+ * Must be rendered inside <ReactFlow> so useReactFlow() works.
+ */
+function SelectedNodeFitView() {
+  const selectedNodeId = useDashboardStore((s) => s.selectedNodeId);
+  const { fitView } = useReactFlow();
+  const prevRef = useRef<string | null>(null);
+
+  useEffect(() => {
+    if (selectedNodeId && selectedNodeId !== prevRef.current) {
+      requestAnimationFrame(() => {
+        fitView({
+          nodes: [{ id: selectedNodeId }],
+          duration: 500,
+          padding: 0.3,
+          maxZoom: 1.2,
+          minZoom: 0.01,
+        });
+      });
+    }
+    prevRef.current = selectedNodeId;
+  }, [selectedNodeId, fitView]);
+
+  return null;
+}
+
+function GraphViewInner() {
   const graph = useDashboardStore((s) => s.graph);
   const selectedNodeId = useDashboardStore((s) => s.selectedNodeId);
   const searchResults = useDashboardStore((s) => s.searchResults);
@@ -261,6 +324,9 @@ export default function GraphView() {
         onPaneClick={onPaneClick}
         nodeTypes={nodeTypes}
         fitView
+        fitViewOptions={{ minZoom: 0.01, padding: 0.1 }}
+        minZoom={0.01}
+        maxZoom={2}
         colorMode="dark"
       >
         <Background variant={BackgroundVariant.Dots} color="rgba(212,165,116,0.15)" gap={20} size={1} />
@@ -270,7 +336,17 @@ export default function GraphView() {
           maskColor="rgba(10,10,10,0.7)"
           className="!bg-surface !border !border-border-subtle"
         />
+        <TourFitView />
+        <SelectedNodeFitView />
       </ReactFlow>
     </div>
+  );
+}
+
+export default function GraphView() {
+  return (
+    <ReactFlowProvider>
+      <GraphViewInner />
+    </ReactFlowProvider>
   );
 }
