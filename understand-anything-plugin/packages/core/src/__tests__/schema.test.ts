@@ -224,13 +224,12 @@ describe("schema validation", () => {
     expect(result.data!.edges[0].type).toBe("depends_on");
   });
 
-  it('normalizes "tests" edge type to "tested_by"', () => {
+  it('rejects "tests" edge type — direction-inverting alias is unsafe', () => {
     const graph = structuredClone(validGraph);
     (graph.edges[0] as any).type = "tests";
 
     const result = validateGraph(graph);
-    expect(result.success).toBe(true);
-    expect(result.data!.edges[0].type).toBe("tested_by");
+    expect(result.success).toBe(false);
   });
 
   it("still rejects truly invalid edge types after normalization", () => {

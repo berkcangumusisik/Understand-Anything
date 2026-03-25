@@ -31,7 +31,6 @@ export const EDGE_TYPE_ALIASES: Record<string, string> = {
   relates_to: "related",
   related_to: "related",
   similar: "similar_to",
-  tests: "tested_by",
   import: "imports",
   export: "exports",
   contain: "contains",
