@@ -1,0 +1,713 @@
+# Instincts generated from https://github.com/berkcangumusisik/Understand-Anything
+# Generated: 2026-03-25T12:30:45.032Z
+# Version: 2.0
+# NOTE: This file supplements (does not replace) any existing curated instincts.
+# High-confidence manually curated instincts should be preserved alongside these.
+
+---
+id: Understand-Anything-commit-conventional
+trigger: "when writing a commit message"
+confidence: 0.85
+domain: git
+source: repo-analysis
+source_repo: https://github.com/berkcangumusisik/Understand-Anything
+---
+
+# Understand Anything Commit Conventional
+
+## Action
+
+Use conventional commit format with prefixes: feat, fix, docs, chore, refactor
+
+## Evidence
+
+- 136 commits analyzed
+- Detected conventional commit pattern
+- Examples: test: add alias chain detection guards, fix: remove unsafe tests→tested_by alias that inverts edge direction
+
+---
+id: Understand-Anything-commit-length
+trigger: "when writing a commit message"
+confidence: 0.6
+domain: git
+source: repo-analysis
+source_repo: https://github.com/berkcangumusisik/Understand-Anything
+---
+
+# Understand Anything Commit Length
+
+## Action
+
+Write moderate-length commit messages (~63 characters)
+
+## Evidence
+
+- Average commit message length: 63 chars
+- Based on 136 commits
+
+---
+id: Understand-Anything-naming-files
+trigger: "when creating a new file"
+confidence: 0.8
+domain: code-style
+source: repo-analysis
+source_repo: https://github.com/berkcangumusisik/Understand-Anything
+---
+
+# Understand Anything Naming Files
+
+## Action
+
+Use camelCase naming convention
+
+## Evidence
+
+- Analyzed file naming patterns in repository
+- Dominant pattern: camelCase
+
+---
+id: Understand-Anything-import-relative
+trigger: "when importing modules"
+confidence: 0.75
+domain: code-style
+source: repo-analysis
+source_repo: https://github.com/berkcangumusisik/Understand-Anything
+---
+
+# Understand Anything Import Relative
+
+## Action
+
+Use relative imports for project files
+
+## Evidence
+
+- Import analysis shows relative import pattern
+- Example: import { x } from '../lib/x'
+
+---
+id: Understand-Anything-export-style
+trigger: "when exporting from a module"
+confidence: 0.7
+domain: code-style
+source: repo-analysis
+source_repo: https://github.com/berkcangumusisik/Understand-Anything
+---
+
+# Understand Anything Export Style
+
+## Action
+
+Prefer named exports
+
+## Evidence
+
+- Export pattern analysis
+- Dominant style: named
+
+---
+id: Understand-Anything-arch-type-based
+trigger: "when adding new code"
+confidence: 0.8
+domain: architecture
+source: repo-analysis
+source_repo: https://github.com/berkcangumusisik/Understand-Anything
+---
+
+# Understand Anything Arch Type Based
+
+## Action
+
+Place code in the appropriate type folder (components/, services/, utils/, etc.)
+
+## Evidence
+
+- Type-based module organization detected
+- Folders: 
+
+---
+id: Understand-Anything-test-framework
+trigger: "when writing tests"
+confidence: 0.9
+domain: testing
+source: repo-analysis
+source_repo: https://github.com/berkcangumusisik/Understand-Anything
+---
+
+# Understand Anything Test Framework
+
+## Action
+
+Use vitest as the test framework
+
+## Evidence
+
+- Test framework detected: vitest
+- File pattern: *.test.ts
+
+---
+id: Understand-Anything-test-naming
+trigger: "when creating a test file"
+confidence: 0.85
+domain: testing
+source: repo-analysis
+source_repo: https://github.com/berkcangumusisik/Understand-Anything
+---
+
+# Understand Anything Test Naming
+
+## Action
+
+Name test files using the pattern: *.test.ts
+
+## Evidence
+
+- File pattern: *.test.ts
+- Consistent across test files
+
+---
+id: Understand-Anything-test-mocking
+trigger: "when mocking dependencies in tests"
+confidence: 0.75
+domain: testing
+source: repo-analysis
+source_repo: https://github.com/berkcangumusisik/Understand-Anything
+---
+
+# Understand Anything Test Mocking
+
+## Action
+
+Use vi.mock for mocking
+
+## Evidence
+
+- Mocking pattern detected: vi.mock
+- Consistent across test files
+
+---
+id: Understand-Anything-test-types
+trigger: "when planning tests for a feature"
+confidence: 0.7
+domain: testing
+source: repo-analysis
+source_repo: https://github.com/berkcangumusisik/Understand-Anything
+---
+
+# Understand Anything Test Types
+
+## Action
+
+Write unit, integration tests to match project standards
+
+## Evidence
+
+- Test types detected: unit, integration
+- Coverage config: no
+
+---
+id: Understand-Anything-workflow-feature-development
+trigger: "when implementing a new feature"
+confidence: 0.9
+domain: workflow
+source: repo-analysis
+source_repo: https://github.com/berkcangumusisik/Understand-Anything
+---
+
+# Understand Anything Workflow Feature Development
+
+## Action
+
+Follow the feature-development workflow:
+1. Add feature implementation
+2. Add tests for feature
+3. Update documentation
+
+## Evidence
+
+- Workflow detected from commit patterns
+- Frequency: ~17x per month
+- Files: understand-anything-plugin/packages/dashboard/src/components/*, understand-anything-plugin/packages/core/src/__tests__/*, understand-anything-plugin/packages/core/src/analyzer/*
+
+---
+id: Understand-Anything-workflow-refactoring
+trigger: "when refactoring code"
+confidence: 0.6
+domain: workflow
+source: repo-analysis
+source_repo: https://github.com/berkcangumusisik/Understand-Anything
+---
+
+# Understand Anything Workflow Refactoring
+
+## Action
+
+Follow the refactoring workflow:
+1. Ensure tests pass before refactor
+2. Refactor code structure
+3. Verify tests still pass
+
+## Evidence
+
+- Workflow detected from commit patterns
+- Frequency: ~2x per month
+- Files: src/**/*
+
+---
+id: Understand-Anything-workflow-add-or-update-language-or-framework-support
+trigger: "when doing add or update language or framework support"
+confidence: 0.6
+domain: workflow
+source: repo-analysis
+source_repo: https://github.com/berkcangumusisik/Understand-Anything
+---
+
+# Understand Anything Workflow Add Or Update Language Or Framework Support
+
+## Action
+
+Follow the add-or-update-language-or-framework-support workflow:
+1. Add or update language/framework config in packages/core/src/languages/configs/*.ts and/or frameworks/*.ts
+2. Update language and framework registry files (language-registry.ts, framework-registry.ts, index.ts)
+3. Add or update prompt snippets in skills/understand/languages/*.md and/or frameworks/*.md
+4. Update or add tests in packages/core/src/__tests__/
+5. Update SKILL.md and related prompt files to inject new snippets or handle new frameworks
+6. Optionally update dashboard or documentation to reflect new support
+
+## Evidence
+
+- Workflow detected from commit patterns
+- Frequency: ~2x per month
+- Files: understand-anything-plugin/packages/core/src/languages/configs/*.ts, understand-anything-plugin/packages/core/src/languages/frameworks/*.ts, understand-anything-plugin/packages/core/src/languages/language-registry.ts
+
+---
+id: Understand-Anything-workflow-dashboard-feature-or-performance-improvement
+trigger: "when doing dashboard feature or performance improvement"
+confidence: 0.6
+domain: workflow
+source: repo-analysis
+source_repo: https://github.com/berkcangumusisik/Understand-Anything
+---
+
+# Understand Anything Workflow Dashboard Feature Or Performance Improvement
+
+## Action
+
+Follow the dashboard-feature-or-performance-improvement workflow:
+1. Edit or add React component files in packages/dashboard/src/components/
+2. Edit or add utility files (e.g., layout.ts, layout.worker.ts) for performance improvements
+3. Update hooks or state management (hooks/useKeyboardShortcuts.ts, etc.)
+4. Update styles in index.css if needed
+5. Optionally update SKILL.md or documentation if user-facing changes
+
+## Evidence
+
+- Workflow detected from commit patterns
+- Frequency: ~2x per month
+- Files: understand-anything-plugin/packages/dashboard/src/components/*.tsx, understand-anything-plugin/packages/dashboard/src/utils/*.ts, understand-anything-plugin/packages/dashboard/src/utils/*.worker.ts
+
+---
+id: Understand-Anything-workflow-multi-platform-installation-instructions-sync
+trigger: "when doing multi platform installation instructions sync"
+confidence: 0.6
+domain: workflow
+source: repo-analysis
+source_repo: https://github.com/berkcangumusisik/Understand-Anything
+---
+
+# Understand Anything Workflow Multi Platform Installation Instructions Sync
+
+## Action
+
+Follow the multi-platform-installation-instructions-sync workflow:
+1. Edit or add INSTALL.md in .antigravity, .codex, .openclaw, .opencode, .gemini, .pi directories
+2. Update plugin manifest files (.claude-plugin/plugin.json, .cursor-plugin/plugin.json, etc.)
+3. Update README.md and all translations with new instructions or compatibility tables
+4. Optionally update CLAUDE.md or CONTRIBUTING.md for developer-facing notes
+
+## Evidence
+
+- Workflow detected from commit patterns
+- Frequency: ~2x per month
+- Files: .antigravity/INSTALL.md, .codex/INSTALL.md, .openclaw/INSTALL.md
+
+---
+id: Understand-Anything-workflow-skill-prompt-pipeline-update
+trigger: "when doing skill prompt pipeline update"
+confidence: 0.6
+domain: workflow
+source: repo-analysis
+source_repo: https://github.com/berkcangumusisik/Understand-Anything
+---
+
+# Understand Anything Workflow Skill Prompt Pipeline Update
+
+## Action
+
+Follow the skill-prompt-pipeline-update workflow:
+1. Edit skills/understand/SKILL.md to update phases, normalization, or prompt logic
+2. Edit related prompt files (architecture-analyzer-prompt.md, file-analyzer-prompt.md, tour-builder-prompt.md, etc.)
+3. Update or add addendum files for frameworks/languages as needed
+4. Optionally update schema.ts or tests if validation logic changes
+
+## Evidence
+
+- Workflow detected from commit patterns
+- Frequency: ~2x per month
+- Files: understand-anything-plugin/skills/understand/SKILL.md, understand-anything-plugin/skills/understand/architecture-analyzer-prompt.md, understand-anything-plugin/skills/understand/file-analyzer-prompt.md
+
+---
+id: Understand-Anything-workflow-add-or-update-localization
+trigger: "when doing add or update localization"
+confidence: 0.6
+domain: workflow
+source: repo-analysis
+source_repo: https://github.com/berkcangumusisik/Understand-Anything
+---
+
+# Understand Anything Workflow Add Or Update Localization
+
+## Action
+
+Follow the add-or-update-localization workflow:
+1. Add or update README.<lang>.md file
+2. Update README.md to include or update language selector links
+3. Optionally update other localized files for new instructions
+
+## Evidence
+
+- Workflow detected from commit patterns
+- Frequency: ~2x per month
+- Files: README.md, README.zh-CN.md, README.ja-JP.md
+
+---
+id: ua-naming-files-camelCase
+trigger: "When creating or renaming a file in the codebase"
+confidence: 0.9
+domain: code-style
+source: repo-analysis
+source_repo: berkcangumusisik/Understand-Anything
+---
+
+# Ua Naming Files CamelCase
+
+## Action
+
+Name the file using camelCase
+
+## Evidence
+
+- Pattern in codeStyle.namingConventions.files
+- Consistent with TypeScript codebase
+
+---
+id: ua-naming-functions-camelCase
+trigger: "When defining a function"
+confidence: 0.9
+domain: code-style
+source: repo-analysis
+source_repo: berkcangumusisik/Understand-Anything
+---
+
+# Ua Naming Functions CamelCase
+
+## Action
+
+Name the function using camelCase
+
+## Evidence
+
+- Pattern in codeStyle.namingConventions.functions
+
+---
+id: ua-naming-classes-PascalCase
+trigger: "When defining a class"
+confidence: 0.9
+domain: code-style
+source: repo-analysis
+source_repo: berkcangumusisik/Understand-Anything
+---
+
+# Ua Naming Classes PascalCase
+
+## Action
+
+Name the class using PascalCase
+
+## Evidence
+
+- Pattern in codeStyle.namingConventions.classes
+
+---
+id: ua-naming-constants-SCREAMING_SNAKE_CASE
+trigger: "When defining a constant"
+confidence: 0.9
+domain: code-style
+source: repo-analysis
+source_repo: berkcangumusisik/Understand-Anything
+---
+
+# Ua Naming Constants SCREAMING_SNAKE_CASE
+
+## Action
+
+Name the constant using SCREAMING_SNAKE_CASE
+
+## Evidence
+
+- Pattern in codeStyle.namingConventions.constants
+
+---
+id: ua-imports-relative
+trigger: "When importing modules"
+confidence: 0.9
+domain: code-style
+source: repo-analysis
+source_repo: berkcangumusisik/Understand-Anything
+---
+
+# Ua Imports Relative
+
+## Action
+
+Use relative import paths
+
+## Evidence
+
+- Pattern in codeStyle.importStyle
+
+---
+id: ua-exports-named
+trigger: "When exporting modules or functions"
+confidence: 0.9
+domain: code-style
+source: repo-analysis
+source_repo: berkcangumusisik/Understand-Anything
+---
+
+# Ua Exports Named
+
+## Action
+
+Use named exports
+
+## Evidence
+
+- Pattern in codeStyle.exportStyle
+
+---
+id: ua-testing-vitest-pattern
+trigger: "When writing a test file"
+confidence: 0.9
+domain: testing
+source: repo-analysis
+source_repo: berkcangumusisik/Understand-Anything
+---
+
+# Ua Testing Vitest Pattern
+
+## Action
+
+Name the file with the pattern *.test.ts and use the vitest framework
+
+## Evidence
+
+- Pattern in testing.filePattern
+- Pattern in testing.framework
+
+---
+id: ua-testing-mocking-vi-mock
+trigger: "When mocking dependencies in tests"
+confidence: 0.85
+domain: testing
+source: repo-analysis
+source_repo: berkcangumusisik/Understand-Anything
+---
+
+# Ua Testing Mocking Vi Mock
+
+## Action
+
+Use vi.mock for mocking
+
+## Evidence
+
+- Pattern in testing.mockingStyle
+
+---
+id: ua-testing-types-unit-integration
+trigger: "When writing tests"
+confidence: 0.8
+domain: testing
+source: repo-analysis
+source_repo: berkcangumusisik/Understand-Anything
+---
+
+# Ua Testing Types Unit Integration
+
+## Action
+
+Write both unit and integration tests as appropriate
+
+## Evidence
+
+- Pattern in testing.testTypes
+
+---
+id: ua-git-commit-conventional-prefix
+trigger: "When making a git commit"
+confidence: 0.9
+domain: git
+source: repo-analysis
+source_repo: berkcangumusisik/Understand-Anything
+---
+
+# Ua Git Commit Conventional Prefix
+
+## Action
+
+Prefix the commit message with a conventional type (feat, fix, docs, chore, refactor)
+
+## Evidence
+
+- Pattern in commits.prefixes
+- Seen in commit examples
+
+---
+id: ua-git-commit-average-length
+trigger: "When writing a commit message"
+confidence: 0.7
+domain: git
+source: repo-analysis
+source_repo: berkcangumusisik/Understand-Anything
+---
+
+# Ua Git Commit Average Length
+
+## Action
+
+Keep the commit message concise, around 60 characters
+
+## Evidence
+
+- Pattern in commits.averageLength
+
+---
+id: ua-git-commit-merge-pull-request-format
+trigger: "When merging a pull request"
+confidence: 0.8
+domain: git
+source: repo-analysis
+source_repo: berkcangumusisik/Understand-Anything
+---
+
+# Ua Git Commit Merge Pull Request Format
+
+## Action
+
+Use the format 'Merge pull request #[number] from [branch]'
+
+## Evidence
+
+- Seen in commit examples (e.g., 'Merge pull request #37...')
+
+---
+id: ua-workflow-add-language-or-framework-support
+trigger: "When adding or updating language/framework support for code analysis"
+confidence: 0.95
+domain: workflow
+source: repo-analysis
+source_repo: berkcangumusisik/Understand-Anything
+---
+
+# Ua Workflow Add Language Or Framework Support
+
+## Action
+
+Update configs, registries, prompt snippets, tests, and SKILL.md as per the workflow
+
+## Evidence
+
+- Workflow: add-or-update-language-or-framework-support
+- Pattern in filesInvolved and commitSequence
+
+---
+id: ua-workflow-dashboard-feature-or-performance-improvement
+trigger: "When adding a dashboard feature or optimizing dashboard performance"
+confidence: 0.9
+domain: workflow
+source: repo-analysis
+source_repo: berkcangumusisik/Understand-Anything
+---
+
+# Ua Workflow Dashboard Feature Or Performance Improvement
+
+## Action
+
+Edit/add React components, utility files, hooks, styles, and optionally update documentation
+
+## Evidence
+
+- Workflow: dashboard-feature-or-performance-improvement
+- Pattern in filesInvolved and commitSequence
+
+---
+id: ua-workflow-multi-platform-installation-instructions-sync
+trigger: "When adding a new platform, updating install instructions, or bumping versions"
+confidence: 0.95
+domain: workflow
+source: repo-analysis
+source_repo: berkcangumusisik/Understand-Anything
+---
+
+# Ua Workflow Multi Platform Installation Instructions Sync
+
+## Action
+
+Edit/add INSTALL.md, update plugin manifests, update README and translations, optionally update developer docs
+
+## Evidence
+
+- Workflow: multi-platform-installation-instructions-sync
+- Pattern in filesInvolved and commitSequence
+
+---
+id: ua-workflow-skill-prompt-pipeline-update
+trigger: "When changing LLM prompt pipeline or normalization/validation logic"
+confidence: 0.9
+domain: workflow
+source: repo-analysis
+source_repo: berkcangumusisik/Understand-Anything
+---
+
+# Ua Workflow Skill Prompt Pipeline Update
+
+## Action
+
+Edit SKILL.md, related prompt files, addenda, and optionally schema/tests
+
+## Evidence
+
+- Workflow: skill-prompt-pipeline-update
+- Pattern in filesInvolved and commitSequence
+
+---
+id: ua-workflow-add-or-update-localization
+trigger: "When adding or updating documentation translations"
+confidence: 0.85
+domain: workflow
+source: repo-analysis
+source_repo: berkcangumusisik/Understand-Anything
+---
+
+# Ua Workflow Add Or Update Localization
+
+## Action
+
+Add/update README.<lang>.md, update language selector links in README.md, optionally update other localized files
+
+## Evidence
+
+- Workflow: add-or-update-localization
+- Pattern in filesInvolved and commitSequence
+
