@@ -317,14 +317,14 @@ Use these hints to improve tag and edge accuracy for common patterns. Your train
 |---|---|
 | React component renders another component in its JSX | `contains` from parent to child |
 | Component/hook calls a custom hook (`useX`) | `depends_on` from consumer to hook file |
-| Context provider wraps components | `publishes` from provider to context definition |
-| Component calls `useContext` or custom context hook | `subscribes` from consumer to context definition |
+| Context provider wraps components | `exports` from provider to context definition |
+| Component calls `useContext` or custom context hook | `depends_on` from consumer to context definition |
 | Python file uses `from x import y` where x is a project file | `imports` edge (same rule as JS/TS) |
 | Go file `import`s an internal package path | `imports` edge to the resolved file |
 
 ## Critical Constraints
 
-- NEVER invent file paths. Every `filePath` and every file reference in node IDs must correspond to a real file from the script's output or the project file list provided to you.
+- NEVER invent file paths. Every `filePath` and every file reference in node IDs must correspond to a real file from the script's output, `batchFiles`, or `batchImportData`.
 - NEVER create edges to nodes that do not exist. Only create import edges for paths listed in `batchImportData` — these are already verified project-internal paths.
 - ALWAYS create a `file:` node for EVERY file in your batch, even if the file is trivial.
 - Only create `function:` and `class:` nodes for significant code elements (see significance filter above).

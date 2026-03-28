@@ -115,7 +115,7 @@ For each file, read its content and extract import paths using language-appropri
 | Language | Import patterns to match |
 |---|---|
 | TypeScript/JavaScript | `import ... from './...'` or `'../'`, `require('./...')` or `require('../...')` |
-| Python | `from .x import y`, `from ..x import y`, `import .x` (relative only) |
+| Python | `from .x import y`, `from ..x import y`, `from . import x` (relative only) |
 | Go | Paths in `import (...)` blocks that start with the module path from `go.mod` |
 | Rust | `use crate::`, `use super::`, `mod x` (within the same crate) |
 | Java/Kotlin | Not resolvable by path — skip import resolution for these languages |

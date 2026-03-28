@@ -190,7 +190,7 @@ Pass these parameters in the dispatch prompt:
 >
 > File nodes:
 > ```json
-> [list of {id, filePath, summary, tags} for all file-type nodes — omit name, complexity, languageNotes]
+> [list of {id, name, filePath, summary, tags} for all file-type nodes — omit complexity, languageNotes]
 > ```
 >
 > Import edges:
@@ -366,7 +366,9 @@ try {
   });
   const fileNodes = graph.nodes.filter(n => n.type === 'file').map(n => n.id);
   const assigned = new Map();
-  (graph.layers || []).forEach(layer => {
+  if (!Array.isArray(graph.layers)) { if (graph.layers) warnings.push('graph.layers is not an array'); graph.layers = []; }
+  if (!Array.isArray(graph.tour)) { if (graph.tour) warnings.push('graph.tour is not an array'); graph.tour = []; }
+  graph.layers.forEach(layer => {
     (layer.nodeIds || []).forEach(id => {
       if (!nodeIds.has(id)) issues.push(`Layer '${layer.id}' refs missing node '${id}'`);
       if (assigned.has(id)) issues.push(`Node '${id}' appears in multiple layers`);
@@ -376,7 +378,7 @@ try {
   fileNodes.forEach(id => {
     if (!assigned.has(id)) issues.push(`File node '${id}' not in any layer`);
   });
-  (graph.tour || []).forEach((step, i) => {
+  graph.tour.forEach((step, i) => {
     (step.nodeIds || []).forEach(id => {
       if (!nodeIds.has(id)) issues.push(`Tour step[${i}] refs missing node '${id}'`);
     });
@@ -391,8 +393,8 @@ try {
   const stats = {
     totalNodes: graph.nodes.length,
     totalEdges: graph.edges.length,
-    totalLayers: (graph.layers || []).length,
-    tourSteps: (graph.tour || []).length,
+    totalLayers: graph.layers.length,
+    tourSteps: graph.tour.length,
     nodeTypes: graph.nodes.reduce((a, n) => { a[n.type] = (a[n.type]||0)+1; return a; }, {}),
     edgeTypes: graph.edges.reduce((a, e) => { a[e.type] = (a[e.type]||0)+1; return a; }, {})
   };
