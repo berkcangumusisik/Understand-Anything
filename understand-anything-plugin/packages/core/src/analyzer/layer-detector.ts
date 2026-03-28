@@ -40,6 +40,16 @@ const LAYER_PATTERNS: Array<{ patterns: string[]; layerName: string; description
     description: "Request/response middleware and interceptors",
   },
   {
+    patterns: ["client", "integration", "external", "sdk", "vendor", "adapter"],
+    layerName: "External Services",
+    description: "External service integrations, SDKs, and third-party adapters",
+  },
+  {
+    patterns: ["worker", "job", "queue", "cron", "consumer", "processor", "scheduler", "background"],
+    layerName: "Background Tasks",
+    description: "Background workers, job processors, and scheduled tasks",
+  },
+  {
     patterns: ["util", "helper", "lib", "common", "shared"],
     layerName: "Utility Layer",
     description: "Shared utilities, helpers, and common libraries",

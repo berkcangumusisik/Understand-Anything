@@ -20,7 +20,7 @@ const typeTextColors: Record<string, string> = {
 
 const complexityColors: Record<string, string> = {
   simple: "text-node-function",
-  moderate: "text-gold-dim",
+  moderate: "text-accent-dim",
   complex: "text-[#c97070]",
 };
 
@@ -36,6 +36,8 @@ export interface CustomNodeData extends Record<string, unknown> {
   isDiffChanged: boolean;
   isDiffAffected: boolean;
   isDiffFaded: boolean;
+  isNeighbor: boolean;
+  isSelectionFaded: boolean;
   onNodeClick?: (nodeId: string) => void;
   incomingCount?: number;
   outgoingCount?: number;
@@ -54,17 +56,17 @@ function CustomNodeComponent({
 
   let extraClass = "";
   if (data.isSelected) {
-    extraClass = "ring-2 ring-gold node-glow";
+    extraClass = "ring-2 ring-accent node-glow";
   } else if (data.isTourHighlighted) {
-    extraClass = "ring-2 ring-gold-dim animate-gold-pulse";
+    extraClass = "ring-2 ring-accent-dim animate-accent-pulse";
   } else if (data.isHighlighted) {
     const score = data.searchScore ?? 1;
     if (score <= 0.1) {
-      extraClass = "ring-2 ring-gold-bright";
+      extraClass = "ring-2 ring-accent-bright";
     } else if (score <= 0.3) {
-      extraClass = "ring-2 ring-gold";
+      extraClass = "ring-2 ring-accent";
     } else {
-      extraClass = "ring-1 ring-gold-dim/60";
+      extraClass = "ring-1 ring-accent-dim/60";
     }
   }
 
@@ -75,6 +77,13 @@ function CustomNodeComponent({
     extraClass += " ring-1 ring-[var(--color-diff-affected)] diff-affected-glow";
   } else if (data.isDiffFaded) {
     extraClass += " diff-faded";
+  }
+
+  // Selection-based dimming (when another node is selected, fade unrelated nodes)
+  if (data.isSelectionFaded) {
+    extraClass += " opacity-20 pointer-events-auto";
+  } else if (data.isNeighbor) {
+    extraClass += " ring-1 ring-gold-dim/50";
   }
 
   const name = data.label ?? "unnamed";

@@ -1,6 +1,15 @@
 export * from "./types.js";
 export * from "./persistence/index.js";
-export { KnowledgeGraphSchema, validateGraph, type ValidationResult } from "./schema.js";
+export {
+  KnowledgeGraphSchema,
+  validateGraph,
+  sanitizeGraph,
+  autoFixGraph,
+  COMPLEXITY_ALIASES,
+  DIRECTION_ALIASES,
+  type ValidationResult,
+  type GraphIssue,
+} from "./schema.js";
 export { TreeSitterPlugin } from "./plugins/tree-sitter-plugin.js";
 export { GraphBuilder } from "./analyzer/graph-builder.js";
 export {
@@ -62,3 +71,22 @@ export {
   cosineSimilarity,
   type SemanticSearchOptions,
 } from "./embedding-search.js";
+export {
+  extractFileFingerprint,
+  compareFingerprints,
+  analyzeChanges,
+  buildFingerprintStore,
+  contentHash,
+  type FunctionFingerprint,
+  type ClassFingerprint,
+  type ImportFingerprint,
+  type FileFingerprint,
+  type FingerprintStore,
+  type ChangeLevel,
+  type FileChangeResult,
+  type ChangeAnalysis,
+} from "./fingerprint.js";
+export {
+  classifyUpdate,
+  type UpdateDecision,
+} from "./change-classifier.js";
