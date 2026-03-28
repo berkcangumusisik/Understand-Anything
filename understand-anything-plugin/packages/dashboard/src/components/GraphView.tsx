@@ -200,6 +200,7 @@ function useLayerDetailTopology() {
   const changedNodeIds = useDashboardStore((s) => s.changedNodeIds);
   const affectedNodeIds = useDashboardStore((s) => s.affectedNodeIds);
   const focusNodeId = useDashboardStore((s) => s.focusNodeId);
+  const nodeTypeFilters = useDashboardStore((s) => s.nodeTypeFilters);
   const drillIntoLayer = useDashboardStore((s) => s.drillIntoLayer);
 
   const handleNodeSelect = useCallback(
@@ -218,12 +219,27 @@ function useLayerDetailTopology() {
 
     const layerNodeIds = new Set(activeLayer.nodeIds);
 
+    // Map node types to filter categories
+    const nodeTypeToCategory: Record<string, string> = {
+      file: "code", function: "code", class: "code", module: "code", concept: "code",
+      config: "config",
+      document: "docs",
+      service: "infra", resource: "infra", pipeline: "infra",
+      table: "data", endpoint: "data", schema: "data",
+    };
+
     // Non-technical persona only sees concept/module/file nodes
     let filteredGraphNodes = persona === "non-technical"
       ? graph.nodes.filter(
           (n) => layerNodeIds.has(n.id) && (n.type === "concept" || n.type === "module" || n.type === "file"),
         )
       : graph.nodes.filter((n) => layerNodeIds.has(n.id) && n.type === "file");
+
+    // Apply node type category filters
+    filteredGraphNodes = filteredGraphNodes.filter((n) => {
+      const category = nodeTypeToCategory[n.type] ?? "code";
+      return nodeTypeFilters[category] !== false;
+    });
 
     let filteredNodeIds = new Set(filteredGraphNodes.map((n) => n.id));
 
@@ -360,7 +376,7 @@ function useLayerDetailTopology() {
 
     const laid = applyDagreLayout(allFlowNodes, allFlowEdges, "TB", dims);
     return { nodes: laid.nodes, edges: laid.edges, portalNodes, portalEdges, filteredEdges: filteredGraphEdges };
-  }, [graph, activeLayerId, persona, handleNodeSelect, diffMode, changedNodeIds, affectedNodeIds, focusNodeId, drillIntoLayer]);
+  }, [graph, activeLayerId, persona, handleNodeSelect, diffMode, changedNodeIds, affectedNodeIds, focusNodeId, nodeTypeFilters, drillIntoLayer]);
 }
 
 /**

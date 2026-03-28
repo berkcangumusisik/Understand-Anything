@@ -53,6 +53,10 @@ interface DashboardStore {
   // Sidebar navigation history (stack of visited node IDs)
   nodeHistory: string[];
 
+  // Node type category filters
+  nodeTypeFilters: Record<string, boolean>;
+  toggleNodeTypeFilter: (category: string) => void;
+
   setGraph: (graph: KnowledgeGraph) => void;
   selectNode: (nodeId: string | null) => void;
   navigateToNode: (nodeId: string) => void;
@@ -124,6 +128,16 @@ export const useDashboardStore = create<DashboardStore>()((set, get) => ({
 
   focusNodeId: null,
   nodeHistory: [],
+
+  nodeTypeFilters: { code: true, config: true, docs: true, infra: true, data: true },
+
+  toggleNodeTypeFilter: (category) =>
+    set((state) => ({
+      nodeTypeFilters: {
+        ...state.nodeTypeFilters,
+        [category]: !state.nodeTypeFilters[category],
+      },
+    })),
 
   setGraph: (graph) => {
     const searchEngine = new SearchEngine(graph.nodes);
