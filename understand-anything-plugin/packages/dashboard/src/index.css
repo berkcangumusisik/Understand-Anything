@@ -27,6 +27,14 @@
   --color-node-class: #8b6fb0;
   --color-node-module: #c9a06c;
   --color-node-concept: #b07a8a;
+  --color-node-config: #5eead4;
+  --color-node-document: #7dd3fc;
+  --color-node-service: #a78bfa;
+  --color-node-table: #6ee7b7;
+  --color-node-endpoint: #fdba74;
+  --color-node-pipeline: #fda4af;
+  --color-node-schema: #fcd34d;
+  --color-node-resource: #a5b4fc;
 
   /* Diff */
   --color-diff-changed: #e05252;

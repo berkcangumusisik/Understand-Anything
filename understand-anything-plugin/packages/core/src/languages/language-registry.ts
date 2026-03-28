@@ -9,6 +9,7 @@ import { builtinLanguageConfigs } from "./configs/index.js";
 export class LanguageRegistry {
   private byId = new Map<string, LanguageConfig>();
   private byExtension = new Map<string, LanguageConfig>();
+  private byFilename = new Map<string, LanguageConfig>();
 
   register(config: LanguageConfig): void {
     const parsed = LanguageConfigSchema.parse(config);
@@ -17,6 +18,11 @@ export class LanguageRegistry {
       // Normalize: strip leading dot if present for lookup consistency
       const key = ext.startsWith(".") ? ext : `.${ext}`;
       this.byExtension.set(key, parsed);
+    }
+    if (parsed.filenames) {
+      for (const filename of parsed.filenames) {
+        this.byFilename.set(filename.toLowerCase(), parsed);
+      }
     }
   }
 
@@ -30,6 +36,11 @@ export class LanguageRegistry {
   }
 
   getForFile(filePath: string): LanguageConfig | null {
+    // Try filename-based lookup first (more specific: docker-compose.yml, Makefile, etc.)
+    const basename = filePath.split("/").pop() ?? filePath;
+    const filenameMatch = this.byFilename.get(basename.toLowerCase());
+    if (filenameMatch) return filenameMatch;
+    // Fall back to extension-based lookup
     const lastDot = filePath.lastIndexOf(".");
     if (lastDot === -1) return null;
     const ext = filePath.slice(lastDot).toLowerCase();

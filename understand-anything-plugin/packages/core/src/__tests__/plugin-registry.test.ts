@@ -1,5 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { PluginRegistry } from "../plugins/registry.js";
+import { registerAllParsers } from "../plugins/parsers/index.js";
 import type { AnalyzerPlugin, StructuralAnalysis, ImportResolution } from "../types.js";
 
 const emptyAnalysis: StructuralAnalysis = {
@@ -177,5 +178,51 @@ describe("PluginRegistry", () => {
 
     const result = registry.resolveImports("main.py", "import os");
     expect(result).toBeNull();
+  });
+
+  it("handles plugins with optional resolveImports (non-code plugins)", () => {
+    const markdownPlugin: AnalyzerPlugin = {
+      name: "markdown",
+      languages: ["markdown"],
+      analyzeFile: () => ({ functions: [], classes: [], imports: [], exports: [] }),
+      // No resolveImports — optional for non-code plugins
+    };
+    const registry = new PluginRegistry();
+    registry.register(markdownPlugin);
+    const result = registry.resolveImports("README.md", "# Hello");
+    expect(result).toBeNull();
+  });
+});
+
+describe("registerAllParsers smoke test", () => {
+  it("all registered parsers return valid StructuralAnalysis for minimal content", () => {
+    const registry = new PluginRegistry();
+    registerAllParsers(registry);
+
+    // Map of file extension -> minimal content for each parser
+    const testCases: [string, string][] = [
+      ["README.md", "# Hello"],
+      ["config.yaml", "key: value"],
+      ["config.json", '{"key": "value"}'],
+      ["config.toml", 'key = "value"'],
+      [".env", "KEY=value"],
+      ["Dockerfile", "FROM node:22"],
+      ["schema.sql", "CREATE TABLE t (id INT);"],
+      ["schema.graphql", "type Query { hello: String }"],
+      ["types.proto", 'syntax = "proto3";'],
+      ["main.tf", 'resource "null" "r" {}'],
+      ["Makefile", "build:\n\techo build"],
+      ["script.sh", "#!/bin/bash\necho hello"],
+    ];
+
+    for (const [filePath, content] of testCases) {
+      const result = registry.analyzeFile(filePath, content);
+      expect(result, `analyzeFile should return a result for ${filePath}`).not.toBeNull();
+      // Verify basic structural analysis shape
+      expect(result).toHaveProperty("functions");
+      expect(result).toHaveProperty("classes");
+      expect(result).toHaveProperty("imports");
+      expect(result).toHaveProperty("exports");
+    }
   });
 });

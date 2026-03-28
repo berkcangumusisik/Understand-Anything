@@ -28,6 +28,8 @@ function App() {
   const setDiffOverlay = useDashboardStore((s) => s.setDiffOverlay);
   const pathFinderOpen = useDashboardStore((s) => s.pathFinderOpen);
   const togglePathFinder = useDashboardStore((s) => s.togglePathFinder);
+  const nodeTypeFilters = useDashboardStore((s) => s.nodeTypeFilters);
+  const toggleNodeTypeFilter = useDashboardStore((s) => s.toggleNodeTypeFilter);
   const [loadError, setLoadError] = useState<string | null>(null);
   const [showKeyboardHelp, setShowKeyboardHelp] = useState(false);
 
@@ -222,6 +224,35 @@ function App() {
         </div>
         <div className="flex items-center gap-4">
           <DiffToggle />
+          <div className="flex items-center gap-1">
+            {([
+              { key: "code", label: "Code", color: "var(--color-node-file)" },
+              { key: "config", label: "Config", color: "var(--color-node-config)" },
+              { key: "docs", label: "Docs", color: "var(--color-node-document)" },
+              { key: "infra", label: "Infra", color: "var(--color-node-service)" },
+              { key: "data", label: "Data", color: "var(--color-node-table)" },
+            ] as const).map((cat) => (
+              <button
+                key={cat.key}
+                onClick={() => toggleNodeTypeFilter(cat.key)}
+                className={`text-[10px] font-semibold uppercase tracking-wider px-2 py-1 rounded border transition-colors flex items-center gap-1.5 ${
+                  nodeTypeFilters[cat.key] !== false
+                    ? "border-border-medium bg-elevated text-text-secondary hover:text-text-primary"
+                    : "border-transparent bg-transparent text-text-muted/40 line-through hover:text-text-muted"
+                }`}
+                title={`${nodeTypeFilters[cat.key] !== false ? "Hide" : "Show"} ${cat.label} nodes`}
+              >
+                <span
+                  className="w-2 h-2 rounded-full shrink-0"
+                  style={{
+                    backgroundColor: cat.color,
+                    opacity: nodeTypeFilters[cat.key] !== false ? 1 : 0.3,
+                  }}
+                />
+                {cat.label}
+              </button>
+            ))}
+          </div>
           <LayerLegend />
           <FilterPanel />
           <ExportMenu />
@@ -294,7 +325,7 @@ function App() {
 
         {/* Code viewer overlay */}
         {codeViewerOpen && (
-          <div className="absolute bottom-0 left-0 right-0 h-[40vh] bg-surface border-t border-border-subtle animate-slide-up z-20">
+          <div className="absolute bottom-0 left-0 right-0 h-[25vh] bg-surface border-t border-border-subtle animate-slide-up z-20">
             <div className="h-full flex flex-col">
               <div className="flex items-center justify-end px-3 py-1 shrink-0">
                 <button

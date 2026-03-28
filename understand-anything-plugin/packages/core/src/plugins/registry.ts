@@ -61,7 +61,7 @@ export class PluginRegistry {
 
   resolveImports(filePath: string, content: string): ImportResolution[] | null {
     const plugin = this.getPluginForFile(filePath);
-    if (!plugin) return null;
+    if (!plugin || !plugin.resolveImports) return null;
     return plugin.resolveImports(filePath, content);
   }
 

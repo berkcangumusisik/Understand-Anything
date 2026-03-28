@@ -1,12 +1,22 @@
 import { useState } from "react";
 import { useDashboardStore } from "../store";
+import type { NodeType, EdgeType } from "@understand-anything/core/types";
 
-const typeBadgeColors: Record<string, string> = {
+// Badge color classes keyed by NodeType — must be kept in sync with core NodeType union.
+const typeBadgeColors: Record<NodeType, string> = {
   file: "text-node-file border border-node-file/30 bg-node-file/10",
   function: "text-node-function border border-node-function/30 bg-node-function/10",
   class: "text-node-class border border-node-class/30 bg-node-class/10",
   module: "text-node-module border border-node-module/30 bg-node-module/10",
   concept: "text-node-concept border border-node-concept/30 bg-node-concept/10",
+  config: "text-node-config border border-node-config/30 bg-node-config/10",
+  document: "text-node-document border border-node-document/30 bg-node-document/10",
+  service: "text-node-service border border-node-service/30 bg-node-service/10",
+  table: "text-node-table border border-node-table/30 bg-node-table/10",
+  endpoint: "text-node-endpoint border border-node-endpoint/30 bg-node-endpoint/10",
+  pipeline: "text-node-pipeline border border-node-pipeline/30 bg-node-pipeline/10",
+  schema: "text-node-schema border border-node-schema/30 bg-node-schema/10",
+  resource: "text-node-resource border border-node-resource/30 bg-node-resource/10",
 };
 
 const complexityBadgeColors: Record<string, string> = {
@@ -16,51 +26,50 @@ const complexityBadgeColors: Record<string, string> = {
 };
 
 /**
- * Human-readable directional labels for edge types.
- * Returns different text depending on whether the selected node is
- * the source or target of the edge.
+ * Human-readable directional labels for all 26 edge types.
+ * Must be kept in sync with core EdgeType.
+ */
+const EDGE_LABELS: Record<EdgeType, { forward: string; backward: string }> = {
+  imports: { forward: "imports", backward: "imported by" },
+  exports: { forward: "exports to", backward: "exported by" },
+  contains: { forward: "contains", backward: "contained in" },
+  inherits: { forward: "inherits from", backward: "inherited by" },
+  implements: { forward: "implements", backward: "implemented by" },
+  calls: { forward: "calls", backward: "called by" },
+  subscribes: { forward: "subscribes to", backward: "subscribed by" },
+  publishes: { forward: "publishes to", backward: "consumed by" },
+  middleware: { forward: "middleware for", backward: "uses middleware" },
+  reads_from: { forward: "reads from", backward: "read by" },
+  writes_to: { forward: "writes to", backward: "written by" },
+  transforms: { forward: "transforms", backward: "transformed by" },
+  validates: { forward: "validates", backward: "validated by" },
+  depends_on: { forward: "depends on", backward: "depended on by" },
+  tested_by: { forward: "tested by", backward: "tests" },
+  configures: { forward: "configures", backward: "configured by" },
+  related: { forward: "related to", backward: "related to" },
+  similar_to: { forward: "similar to", backward: "similar to" },
+  deploys: { forward: "deploys", backward: "deployed by" },
+  serves: { forward: "serves", backward: "served by" },
+  migrates: { forward: "migrates", backward: "migrated by" },
+  documents: { forward: "documents", backward: "documented by" },
+  provisions: { forward: "provisions", backward: "provisioned by" },
+  routes: { forward: "routes to", backward: "routed from" },
+  defines_schema: { forward: "defines schema for", backward: "schema defined by" },
+  triggers: { forward: "triggers", backward: "triggered by" },
+};
+
+/**
+ * Returns a human-readable directional label for an edge type.
+ * Falls back to formatted type name for unknown edge types.
  */
 function getDirectionalLabel(edgeType: string, isSource: boolean): string {
-  switch (edgeType) {
-    case "imports":
-      return isSource ? "imports" : "imported by";
-    case "exports":
-      return isSource ? "exports to" : "exported by";
-    case "contains":
-      return isSource ? "contains" : "contained in";
-    case "inherits":
-      return isSource ? "inherits from" : "inherited by";
-    case "implements":
-      return isSource ? "implements" : "implemented by";
-    case "calls":
-      return isSource ? "calls" : "called by";
-    case "subscribes":
-      return isSource ? "subscribes to" : "subscribed by";
-    case "publishes":
-      return isSource ? "publishes to" : "consumed by";
-    case "middleware":
-      return isSource ? "middleware for" : "uses middleware";
-    case "reads_from":
-      return isSource ? "reads from" : "read by";
-    case "writes_to":
-      return isSource ? "writes to" : "written by";
-    case "transforms":
-      return isSource ? "transforms" : "transformed by";
-    case "validates":
-      return isSource ? "validates" : "validated by";
-    case "depends_on":
-      return isSource ? "depends on" : "depended on by";
-    case "tested_by":
-      return isSource ? "tested by" : "tests";
-    case "configures":
-      return isSource ? "configures" : "configured by";
-    case "related":
-      return "related to";
-    case "similar_to":
-      return "similar to";
-    default:
-      return isSource ? edgeType : `${edgeType} (reverse)`;
+  const labels = (EDGE_LABELS as Record<string, { forward: string; backward: string }>)[edgeType];
+  if (!labels) {
+    // Fallback for unknown edge types
+    const formatted = edgeType.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+    return isSource ? formatted : `${formatted} (reverse)`;
   }
+  return isSource ? labels.forward : labels.backward;
 }
 
 export default function NodeInfo() {
@@ -108,9 +117,14 @@ export default function NodeInfo() {
     .map((e) => graph?.nodes.find((n) => n.id === e.target))
     .filter(Boolean);
 
-  const typeBadge = typeBadgeColors[node.type] ?? typeBadgeColors.file;
+  const knownType = node.type as NodeType;
+  const typeBadge = typeBadgeColors[knownType] ?? typeBadgeColors.file;
   const complexityBadge =
     complexityBadgeColors[node.complexity] ?? complexityBadgeColors.simple;
+
+  if (import.meta.env.DEV && !(knownType in typeBadgeColors)) {
+    console.warn(`[NodeInfo] Unknown node type "${node.type}" — using "file" badge colors`);
+  }
 
   return (
     <div className="h-full w-full overflow-auto p-5 animate-fade-slide-in">
@@ -245,7 +259,7 @@ export default function NodeInfo() {
           <div className="space-y-1">
             {childNodes.map((child) => {
               if (!child) return null;
-              const childTypeBadge = typeBadgeColors[child.type] ?? typeBadgeColors.file;
+              const childTypeBadge = typeBadgeColors[child.type as NodeType] ?? typeBadgeColors.file;
               const childComplexity = complexityBadgeColors[child.complexity] ?? complexityBadgeColors.simple;
               return (
                 <div

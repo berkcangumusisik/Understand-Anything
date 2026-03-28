@@ -1,15 +1,23 @@
-// Edge types (18 total in 5 categories: Structural, Behavioral, Data flow, Dependencies, Semantic)
+// Node types (13 total: 5 code + 8 non-code)
+export type NodeType =
+  | "file" | "function" | "class" | "module" | "concept"
+  | "config" | "document" | "service" | "table" | "endpoint"
+  | "pipeline" | "schema" | "resource";
+
+// Edge types (26 total in 6 categories: Structural, Behavioral, Data flow, Dependencies, Semantic, Infrastructure/Schema)
 export type EdgeType =
   | "imports" | "exports" | "contains" | "inherits" | "implements"  // Structural
   | "calls" | "subscribes" | "publishes" | "middleware"              // Behavioral
   | "reads_from" | "writes_to" | "transforms" | "validates"         // Data flow
   | "depends_on" | "tested_by" | "configures"                       // Dependencies
-  | "related" | "similar_to";                                        // Semantic
+  | "related" | "similar_to"                                         // Semantic
+  | "deploys" | "serves" | "provisions" | "triggers"                // Infrastructure
+  | "migrates" | "documents" | "routes" | "defines_schema";         // Schema/Data
 
-// GraphNode with 5 types: file, function, class, module, concept
+// GraphNode with 13 types: 5 code + 8 non-code
 export interface GraphNode {
   id: string;
-  type: "file" | "function" | "class" | "module" | "concept";
+  type: NodeType;
   name: string;
   filePath?: string;
   lineRange?: [number, number];
@@ -86,12 +94,65 @@ export interface ProjectConfig {
   autoUpdate: boolean;
 }
 
+// Non-code structural sub-interfaces
+export interface SectionInfo {
+  name: string;
+  level: number;
+  lineRange: [number, number];
+}
+
+export interface DefinitionInfo {
+  name: string;
+  /** Parser-reported definition kind. Known values: "table", "view", "index", "message", "enum", "type", "input", "interface", "union", "scalar", "variable", "output", "resource", "data", "section", "target", "stage" */
+  kind: string;
+  lineRange: [number, number];
+  fields: string[];
+}
+
+export interface ServiceInfo {
+  name: string;
+  image?: string;
+  ports: number[];
+  lineRange?: [number, number];
+}
+
+export interface EndpointInfo {
+  method?: string;
+  path: string;
+  lineRange: [number, number];
+}
+
+export interface StepInfo {
+  name: string;
+  lineRange: [number, number];
+}
+
+export interface ResourceInfo {
+  name: string;
+  kind: string;
+  lineRange: [number, number];
+}
+
+export interface ReferenceResolution {
+  source: string;
+  target: string;
+  referenceType: string; // "file", "image", "schema", "service"
+  line?: number;
+}
+
 // Plugin interfaces
 export interface StructuralAnalysis {
   functions: Array<{ name: string; lineRange: [number, number]; params: string[]; returnType?: string }>;
   classes: Array<{ name: string; lineRange: [number, number]; methods: string[]; properties: string[] }>;
   imports: Array<{ source: string; specifiers: string[]; lineNumber: number }>;
   exports: Array<{ name: string; lineNumber: number }>;
+  // Non-code structural data (all optional for backward compat)
+  sections?: SectionInfo[];
+  definitions?: DefinitionInfo[];
+  services?: ServiceInfo[];
+  endpoints?: EndpointInfo[];
+  steps?: StepInfo[];
+  resources?: ResourceInfo[];
 }
 
 export interface ImportResolution {
@@ -110,6 +171,7 @@ export interface AnalyzerPlugin {
   name: string;
   languages: string[];
   analyzeFile(filePath: string, content: string): StructuralAnalysis;
-  resolveImports(filePath: string, content: string): ImportResolution[];
+  resolveImports?(filePath: string, content: string): ImportResolution[];
   extractCallGraph?(filePath: string, content: string): CallGraphEntry[];
+  extractReferences?(filePath: string, content: string): ReferenceResolution[];
 }

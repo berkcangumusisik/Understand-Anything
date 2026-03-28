@@ -28,6 +28,8 @@ export const EDGE_CATEGORY_MAP: Record<EdgeCategory, string[]> = {
   semantic: ["related", "similar_to"],
 };
 
+/** Categories used for node type filter toggles. Single source of truth for NodeCategory. */
+export type NodeCategory = "code" | "config" | "docs" | "infra" | "data";
 
 /** Find which layer a node belongs to. Returns layerId or null. */
 function findNodeLayer(graph: KnowledgeGraph, nodeId: string): string | null {
@@ -78,6 +80,10 @@ interface DashboardStore {
   exportMenuOpen: boolean;
   pathFinderOpen: boolean;
   reactFlowInstance: ReactFlowInstance | null;
+
+  // Node type category filters
+  nodeTypeFilters: Record<NodeCategory, boolean>;
+  toggleNodeTypeFilter: (category: NodeCategory) => void;
 
   setGraph: (graph: KnowledgeGraph) => void;
   selectNode: (nodeId: string | null) => void;
@@ -169,6 +175,16 @@ export const useDashboardStore = create<DashboardStore>()((set, get) => ({
   exportMenuOpen: false,
   pathFinderOpen: false,
   reactFlowInstance: null,
+
+  nodeTypeFilters: { code: true, config: true, docs: true, infra: true, data: true },
+
+  toggleNodeTypeFilter: (category) =>
+    set((state) => ({
+      nodeTypeFilters: {
+        ...state.nodeTypeFilters,
+        [category]: !state.nodeTypeFilters[category],
+      },
+    })),
 
   setGraph: (graph) => {
     const searchEngine = new SearchEngine(graph.nodes);
