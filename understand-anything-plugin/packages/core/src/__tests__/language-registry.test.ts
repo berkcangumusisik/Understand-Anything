@@ -32,9 +32,9 @@ describe("LanguageRegistry", () => {
     expect(registry.getForFile("file.unknown")).toBeNull();
   });
 
-  it("returns null for files without extensions", () => {
+  it("returns null for files without extensions and no filename match", () => {
     const registry = new LanguageRegistry();
-    expect(registry.getForFile("Makefile")).toBeNull();
+    expect(registry.getForFile("SOMEFILE")).toBeNull();
   });
 
   it("lists all registered languages", () => {
@@ -48,10 +48,10 @@ describe("LanguageRegistry", () => {
   });
 
   describe("createDefault", () => {
-    it("registers all 12 built-in language configs", () => {
+    it("registers all 38 built-in language configs", () => {
       const registry = LanguageRegistry.createDefault();
       const all = registry.getAllLanguages();
-      expect(all.length).toBe(12);
+      expect(all.length).toBe(38);
     });
 
     it("maps all expected extensions", () => {
@@ -86,6 +86,58 @@ describe("LanguageRegistry", () => {
       for (const config of registry.getAllLanguages()) {
         expect(config.concepts.length).toBeGreaterThan(0);
       }
+    });
+  });
+
+  describe("Non-code language configs", () => {
+    it("detects all non-code file types via extension", () => {
+      const registry = LanguageRegistry.createDefault();
+      const expectations: [string, string][] = [
+        ["README.md", "markdown"],
+        ["config.yaml", "yaml"],
+        ["package.json", "json"],
+        ["config.toml", "toml"],
+        [".env", "env"],
+        ["pom.xml", "xml"],
+        ["Dockerfile", "dockerfile"],
+        ["schema.sql", "sql"],
+        ["schema.graphql", "graphql"],
+        ["types.proto", "protobuf"],
+        ["main.tf", "terraform"],
+        ["Makefile", "makefile"],
+        ["deploy.sh", "shell"],
+        ["index.html", "html"],
+        ["styles.css", "css"],
+        ["data.csv", "csv"],
+        ["deploy.ps1", "powershell"],
+      ];
+      for (const [file, expectedId] of expectations) {
+        const config = registry.getForFile(file);
+        expect(config?.id, `${file} should be detected as ${expectedId}`).toBe(expectedId);
+      }
+    });
+
+    it("detects filename-based configs (Dockerfile, Makefile, Jenkinsfile)", () => {
+      const registry = LanguageRegistry.createDefault();
+      expect(registry.getForFile("Dockerfile")?.id).toBe("dockerfile");
+      expect(registry.getForFile("Makefile")?.id).toBe("makefile");
+      expect(registry.getForFile("Jenkinsfile")?.id).toBe("jenkinsfile");
+      expect(registry.getForFile("src/Dockerfile")?.id).toBe("dockerfile");
+      expect(registry.getForFile("build/Makefile")?.id).toBe("makefile");
+    });
+
+    it("detects filename-based configs for docker-compose", () => {
+      const registry = LanguageRegistry.createDefault();
+      expect(registry.getForFile("docker-compose.yml")?.id).toBe("docker-compose");
+      expect(registry.getForFile("docker-compose.yaml")?.id).toBe("docker-compose");
+      expect(registry.getForFile("compose.yml")?.id).toBe("docker-compose");
+    });
+
+    it("detects .env file variants", () => {
+      const registry = LanguageRegistry.createDefault();
+      expect(registry.getForFile(".env")?.id).toBe("env");
+      expect(registry.getForFile(".env.local")?.id).toBe("env");
+      expect(registry.getForFile(".env.production")?.id).toBe("env");
     });
   });
 });

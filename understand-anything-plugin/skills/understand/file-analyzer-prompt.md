@@ -403,7 +403,10 @@ Using the script's structural data and file categories, create edges:
 | `migrates` | SQL migration file modifies a table/schema (e.g., ALTER TABLE, CREATE TABLE) | `0.7` | `forward` |
 | `triggers` | CI/CD config triggers a pipeline or deployment (e.g., GitHub Actions workflow deploys on push to main) | `0.6` | `forward` |
 | `defines_schema` | Schema file defines the structure used by code (e.g., GraphQL schema defines API types, Protobuf defines message format) | `0.8` | `forward` |
-| `related` | Non-code file is topically related to another file without a specific structural relationship | `0.3` | `forward` |
+| `serves` | K8s Service/Deployment exposes an endpoint, or a reverse proxy routes to a service | `0.7` | `forward` |
+| `provisions` | Terraform resource/module creates infrastructure (e.g., creates a database, provisions a VM) | `0.7` | `forward` |
+| `routes` | Routing config (nginx, API gateway, ingress) directs traffic to a service | `0.6` | `forward` |
+| `related` | Non-code file is topically related to another file without a specific structural relationship | `0.5` | `forward` |
 | `depends_on` | Non-code file depends on another file (e.g., docker-compose depends on Dockerfile, CI workflow depends on Makefile targets) | `0.6` | `forward` |
 
 **Import edge creation rule for code files:** For each resolved path in `batchImportData[filePath]` (provided in the input JSON), create an `imports` edge from the current file node to `file:<resolvedPath>`. The `batchImportData` values contain only resolved project-internal paths — external packages have already been filtered out. Do NOT attempt to re-resolve imports from source.
@@ -415,6 +418,9 @@ Using the script's structural data and file categories, create edges:
 - **SQL files:** Create `migrates` edges between migration files and the table nodes they modify. Create `defines_schema` edges from schema files to API handlers that serve that data.
 - **CI configs:** Create `triggers` edges to the deployment targets or test suites they invoke.
 - **GraphQL/Protobuf schemas:** Create `defines_schema` edges to the code files that implement the resolvers or service handlers.
+- **K8s manifests:** Create `serves` edges when a Service/Deployment exposes an endpoint or routes to a container. Create `deploys` edges to the application code that runs inside the container.
+- **Terraform files:** Create `provisions` edges from Terraform resource/module definitions to the infrastructure they create (e.g., database resources, VM instances).
+- **Routing configs (nginx, API gateway, ingress):** Create `routes` edges from routing configuration to the services they direct traffic to.
 
 Do NOT use edge types not listed in the tables above.
 
@@ -536,7 +542,7 @@ Produce a single, valid JSON block. Validate it mentally before writing -- malfo
 
 **Required fields for every node:**
 - `id` (string) -- must follow the ID conventions above
-- `type` (string) -- one of: `file`, `function`, `class`, `config`, `document`, `service`, `table`, `endpoint`, `pipeline`, `schema`, `resource`
+- `type` (string) -- one of: `file`, `function`, `class`, `config`, `document`, `service`, `table`, `endpoint`, `pipeline`, `schema`, `resource` (11 of the 13 schema types; `module` and `concept` are reserved for higher-level analysis agents)
 - `name` (string) -- display name (filename for file nodes, function/class name for others)
 - `summary` (string) -- 1-2 sentence description, NEVER empty
 - `tags` (string[]) -- 3-5 lowercase hyphenated tags, NEVER empty
